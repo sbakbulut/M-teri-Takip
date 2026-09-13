@@ -1,0 +1,1192 @@
+<!doctype html>
+<html lang="tr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1" />
+  <meta name="theme-color" content="#81d8d0" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
+  <title>Tiffany Lead Tracker v2 - AI + Drive Sync</title>
+  <style>
+    :root{
+      --tiffany:#81d8d0; --tiffany-dark:#4ab7ad; --ink:#111; --muted:#747b86;
+      --bg:#f6f7f7; --card:#fff; --line:#e8eaee; --soft:#f1fbfa;
+      --danger:#dc2626; --warn:#f59e0b; --ok:#16a34a; --blue:#2563eb;
+      --status-new:#94a3b8; --status-contacted:#2563eb; --status-appointment:#7c3aed; --status-won:#16a34a;
+      --shadow:0 10px 30px rgba(17,17,17,.06);
+    }
+    *{box-sizing:border-box} html{scroll-behavior:smooth}
+    body{margin:0;font-family:Arial,Helvetica,sans-serif;background:var(--bg);color:var(--ink);}
+    button,input,select,textarea{font:inherit} button{cursor:pointer;-webkit-tap-highlight-color:transparent}
+    .top{position:sticky;top:0;z-index:10;background:var(--tiffany);padding:18px 16px 14px;box-shadow:0 1px 0 rgba(0,0,0,.06)}
+    .brand{text-align:center;letter-spacing:.22em;font-size:18px;font-weight:500}.sub{text-align:center;font-size:10px;letter-spacing:.18em;margin-top:6px}
+    .wrap{max-width:860px;margin:0 auto;padding:14px 14px 92px}.switch{display:grid;grid-template-columns:repeat(3,1fr);gap:6px;background:#eaf7f6;border:1px solid #cbeeed;border-radius:18px;padding:6px;margin:12px 0}
+    .switch button{border:0;border-radius:14px;padding:12px 6px;background:transparent;font-weight:800;font-size:13px;line-height:1.2}.switch button.active{background:#111;color:#fff}
+    .hero{background:linear-gradient(135deg,#fff,var(--soft));border:1px solid var(--line);border-radius:24px;padding:16px;box-shadow:var(--shadow);margin-bottom:12px}
+    .hero-top{display:flex;justify-content:space-between;gap:12px;align-items:flex-start}.hero h2{margin:0;font-size:20px}.hint{color:var(--muted);font-size:13px;line-height:1.45;margin-top:6px}.pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:8px 10px;background:#fff;border:1px solid var(--line);font-size:12px;font-weight:800;white-space:nowrap}
+    .grid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}.kpi{background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;box-shadow:0 4px 14px rgba(0,0,0,.03)}.kpi b{display:block;font-size:26px}.kpi span{display:block;margin-top:5px;color:var(--muted);font-size:12px}.kpi.danger b{color:var(--danger)}.kpi.warn b{color:var(--warn)}.kpi.ok b{color:var(--ok)}
+    .actions{display:grid;grid-template-columns:1.2fr 1fr;gap:10px;margin:12px 0}.btn{border:0;border-radius:18px;padding:15px 14px;font-weight:900;background:#111;color:#fff}.btn.tiffany{background:var(--tiffany);color:#111}.btn.outline{background:#fff;color:#111;border:2px solid #111}.btn.light{background:#fff;color:#111;border:1px solid var(--line)}.btn.green{background:#22c55e;color:#fff}.btn.red{background:#fee2e2;color:#991b1b}.btn:active{transform:scale(.99)}
+    .filters{display:flex;gap:8px;overflow-x:auto;padding:2px 0 12px}.chip{border:1px solid var(--line);background:#fff;border-radius:999px;padding:10px 14px;font-weight:800;font-size:13px;white-space:nowrap}.chip.active{background:#111;color:#fff;border-color:#111}
+    .search{width:100%;border:1px solid var(--line);border-radius:18px;background:#fff;padding:15px;margin-bottom:12px;font-size:15px}.selects{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:12px}.select{width:100%;border:1px solid var(--line);border-radius:16px;background:#fff;padding:13px}.ca-tools{display:grid;grid-template-columns:1fr;gap:8px;margin:-4px 0 12px}.ca-rename-hint{font-size:12px;color:var(--muted);padding:0 4px}
+    .section-title{display:flex;justify-content:space-between;align-items:center;margin:18px 2px 10px}.section-title h3{margin:0;font-size:16px}.count{color:var(--muted);font-size:12px;font-weight:800}
+    .list{display:grid;gap:10px}.card{background:#fff;border:1px solid var(--line);border-radius:22px;padding:14px;box-shadow:var(--shadow)}.card.overdue{border-left:6px solid var(--danger)}.card.vip{border-left:6px solid var(--tiffany-dark)}.card.status-new{border-left:6px solid var(--status-new)}.card.status-contacted{border-left:6px solid var(--status-contacted)}.card.status-appointment{border-left:6px solid var(--status-appointment)}.card.status-won{border-left:6px solid var(--status-won)}.status-badge{display:inline-flex;align-items:center;border-radius:999px;padding:5px 8px;font-size:11px;font-weight:900;color:#fff;margin-left:6px}.status-badge.new{background:var(--status-new)}.status-badge.contacted{background:var(--status-contacted)}.status-badge.appointment{background:var(--status-appointment)}.status-badge.followup{background:#f59e0b}.status-badge.won{background:var(--status-won)}
+    .card-top{display:flex;justify-content:space-between;gap:10px}.name{font-size:17px;font-weight:900}.meta{margin-top:4px;color:var(--muted);font-size:12px;line-height:1.4}.product{margin-top:10px;background:#f8fafc;border:1px solid #eef2f7;border-radius:14px;padding:10px;font-size:13px}.appointment-line{margin-top:10px;background:#f3e8ff;border:1px solid #ddd6fe;border-radius:14px;padding:10px;font-size:13px;font-weight:900;color:#5b21b6}.outreach-line{margin-top:10px;background:#fff7ed;border:1px solid #fed7aa;border-radius:14px;padding:10px;font-size:13px;font-weight:900;color:#9a3412}.next{margin-top:10px;background:var(--soft);border:1px solid #c7f0ed;border-radius:14px;padding:10px;font-size:13px;font-weight:800}.row{display:grid;grid-template-columns:1fr 1fr 1fr;gap:8px;margin-top:12px}.mini{border:1px solid var(--line);background:#fff;border-radius:14px;padding:11px 8px;font-weight:900;font-size:12px}.mini.primary{background:var(--tiffany);border-color:var(--tiffany);color:#111}.mini.dark{background:#111;color:#fff;border-color:#111}.mini.green{background:#22c55e;color:#fff;border-color:#22c55e}.details{margin-top:10px}.details summary{font-size:12px;color:var(--muted);font-weight:900;list-style:none}.details summary::-webkit-details-marker{display:none}.details-body{margin-top:10px;display:grid;gap:8px}.note{color:#5b6470;font-size:13px;line-height:1.4;background:#fafafa;border:1px solid #f0f0f0;border-radius:12px;padding:10px}.mini-list{display:grid;gap:8px}.mini-item{background:#fff;border:1px solid var(--line);border-radius:14px;padding:10px;font-size:13px}.mini-item b{display:block;font-size:14px}.mini-item span{display:block;color:var(--muted);margin-top:4px}
+    .manager{display:none}.manager.active,.advisor.active,.todos.active{display:block}.advisor,.todos{display:none}.report{white-space:pre-wrap;background:#fff;border:1px solid var(--line);border-radius:18px;padding:14px;line-height:1.55;font-size:13px;max-height:280px;overflow:auto}.bars{display:grid;gap:10px}.bar-row{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px}.bar-label{display:flex;justify-content:space-between;font-size:13px;font-weight:800;margin-bottom:8px}.bar{height:10px;border-radius:999px;background:#f1f5f9;overflow:hidden}.bar i{display:block;height:100%;background:var(--tiffany-dark)}
+    .modal{position:fixed;inset:0;background:rgba(0,0,0,.45);display:none;align-items:flex-end;z-index:40}.modal.open{display:flex}.sheet{background:#fff;border-radius:28px 28px 0 0;width:100%;max-width:860px;margin:0 auto;padding:18px;max-height:92vh;overflow:auto}.sheet-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:14px}.sheet h3{margin:0}.form{display:grid;gap:10px}.form.two{grid-template-columns:1fr 1fr}.input,.textarea{width:100%;border:1px solid var(--line);border-radius:16px;padding:14px;background:#fff}.textarea{min-height:84px;resize:vertical}.field label{display:block;color:var(--muted);font-size:11px;font-weight:900;letter-spacing:.08em;text-transform:uppercase;margin:4px 0 6px}.full{grid-column:1/-1}.bottom-add{position:fixed;right:18px;bottom:18px;width:64px;height:64px;border-radius:50%;border:0;background:#111;color:#fff;font-size:34px;box-shadow:0 12px 30px rgba(0,0,0,.25);z-index:20}.toast{position:fixed;left:14px;right:14px;bottom:14px;background:#111;color:#fff;border-radius:16px;padding:14px;display:none;z-index:60}.toast.show{display:block}.hidden{display:none!important}
+    .todo-list{display:grid;gap:8px;margin-top:4px}.todo-item{background:#fff;border:1px solid var(--line);border-radius:16px;padding:12px;display:flex;align-items:flex-start;gap:10px;transition:all .15s}.todo-item.done{background:#f0fdf4;border-color:#bbf7d0}.todo-item.done .todo-customer,.todo-item.done .todo-text{text-decoration:line-through;color:var(--muted)}.todo-check{flex-shrink:0;width:26px;height:26px;border:2px solid var(--line);border-radius:8px;background:#fff;cursor:pointer;display:flex;align-items:center;justify-content:center;font-size:15px;color:#fff;font-weight:900}.todo-check.checked{background:var(--ok);border-color:var(--ok)}.todo-content{flex:1;min-width:0}.todo-customer{font-weight:900;font-size:14px;color:var(--ink);display:flex;align-items:center;gap:6px;flex-wrap:wrap}.todo-text{font-size:13px;color:#374151;margin-top:4px;line-height:1.45;white-space:pre-wrap;word-break:break-word}.todo-meta{display:flex;gap:6px;margin-top:6px;flex-wrap:wrap}.todo-tag{font-size:11px;padding:3px 8px;border-radius:999px;background:#f1f5f9;color:#475569;font-weight:800;white-space:nowrap}.todo-tag.today{background:#fef3c7;color:#92400e}.todo-tag.overdue{background:#fee2e2;color:#991b1b}.todo-tag.upcoming{background:#dbeafe;color:#1e40af}.todo-tag.normal{background:#f1f5f9;color:#475569}.todo-del{flex-shrink:0;border:0;background:transparent;color:var(--danger);font-size:20px;cursor:pointer;padding:4px 8px;line-height:1;font-weight:900}.todo-del:hover{background:#fee2e2;border-radius:8px}.todo-actions{flex-shrink:0;display:flex;gap:2px;align-items:flex-start}.todo-edit{flex-shrink:0;border:0;background:transparent;color:var(--ink);font-size:16px;cursor:pointer;padding:6px 8px;line-height:1;font-weight:900;border-radius:8px}.todo-edit:hover{background:#eaf7f6}.todo-empty{padding:18px;text-align:center;color:var(--muted);font-size:13px;background:#fafafa;border:1px dashed var(--line);border-radius:14px}.todo-add-btn{background:#111;color:#fff;border:0;border-radius:14px;padding:10px 12px;font-weight:900;font-size:13px;margin-top:10px;width:100%}
+    @media(max-width:640px){.brand{font-size:16px}.wrap{padding:12px 12px 90px}.grid{grid-template-columns:repeat(3,1fr);gap:8px}.kpi{padding:12px 10px}.kpi b{font-size:22px}.kpi span{font-size:11px}.actions{grid-template-columns:1fr}.selects{grid-template-columns:1fr 1fr}.row{grid-template-columns:1fr 1fr}.row .wide{grid-column:1/-1}.form.two{grid-template-columns:1fr}.card{padding:13px}.hero h2{font-size:18px}.switch button{font-size:11px;padding:10px 4px}}
+
+    /* ============================================================
+       AI + DRIVE SYNC EKLEMELERİ
+       ============================================================ */
+
+    /* Sync durumu (header pill yanında) */
+    .sync-pill{display:inline-flex;align-items:center;gap:6px;border-radius:999px;padding:6px 10px;background:rgba(255,255,255,.6);border:1px solid var(--line);font-size:11px;font-weight:800;white-space:nowrap;color:var(--ink);font-family:Arial,Helvetica,sans-serif}
+    .sync-pill .dot{width:8px;height:8px;border-radius:50%;background:var(--muted)}
+    .sync-pill.ok .dot{background:var(--ok)}
+    .sync-pill.syncing .dot{background:var(--blue);animation:pulse 1s infinite}
+    .sync-pill.error .dot{background:var(--danger)}
+    .sync-pill.offline .dot{background:var(--muted)}
+    .sync-pill.unauth .dot{background:var(--warn)}
+    .sync-pill.idle .dot{background:var(--muted)}
+    @keyframes pulse{0%,100%{opacity:1}50%{opacity:.4}}
+
+    /* AI floating butonu (sağ alt) */
+    .ai-fab{position:fixed;right:18px;bottom:96px;width:58px;height:58px;border-radius:50%;border:0;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-size:26px;box-shadow:0 12px 28px rgba(124,58,237,.45);z-index:30;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .15s}
+    .ai-fab:active{transform:scale(.96)}
+    .ai-fab.voice-live{background:linear-gradient(135deg,#ec4899,#ef4444);animation:pulse 1.4s infinite}
+
+    /* AI Modal */
+    .ai-modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:flex-end;z-index:50}
+    .ai-modal.open{display:flex}
+    .ai-sheet{background:#fff;border-radius:28px 28px 0 0;width:100%;max-width:860px;margin:0 auto;padding:18px;max-height:92vh;display:flex;flex-direction:column;overflow:hidden}
+    .ai-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
+    .ai-head h3{margin:0;font-size:18px;display:flex;align-items:center;gap:8px}
+    .ai-tabs{display:flex;gap:6px;margin-bottom:10px}
+    .ai-tab{flex:1;padding:10px;border:1px solid var(--line);background:#fff;border-radius:14px;font-weight:800;font-size:13px;cursor:pointer}
+    .ai-tab.active{background:#111;color:#fff;border-color:#111}
+    .ai-msgs{flex:1;overflow-y:auto;background:#f8fafc;border:1px solid var(--line);border-radius:18px;padding:12px;display:flex;flex-direction:column;gap:10px;min-height:240px;max-height:50vh}
+    .ai-msg{max-width:88%;padding:10px 14px;border-radius:16px;font-size:14px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
+    .ai-msg.user{background:#111;color:#fff;align-self:flex-end;border-bottom-right-radius:6px}
+    .ai-msg.bot{background:#fff;color:var(--ink);border:1px solid var(--line);align-self:flex-start;border-bottom-left-radius:6px}
+    .ai-msg.bot.thinking{opacity:.7;font-style:italic}
+    .ai-msg.error{background:#fee2e2;color:#7f1d1d;border:1px solid #fecaca;align-self:flex-start}
+    .ai-typing{display:inline-flex;gap:4px;align-items:center}
+    .ai-typing span{width:6px;height:6px;border-radius:50%;background:var(--muted);animation:pulse 1.2s infinite}
+    .ai-typing span:nth-child(2){animation-delay:.2s}
+    .ai-typing span:nth-child(3){animation-delay:.4s}
+    .ai-input-row{display:flex;gap:8px;margin-top:10px}
+    .ai-input{flex:1;border:1px solid var(--line);border-radius:18px;padding:14px;background:#fff;font-size:14px;resize:none;min-height:48px;max-height:120px;font-family:inherit}
+    .ai-send{border:0;border-radius:18px;padding:0 18px;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-weight:900;cursor:pointer;font-size:15px}
+    .ai-send:active{transform:scale(.96)}
+    .ai-send:disabled{opacity:.5;cursor:not-allowed}
+    .ai-tools{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
+    .ai-tool-btn{border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 12px;font-size:12px;font-weight:800;cursor:pointer}
+    .ai-tool-btn:active{background:#f1f5f9}
+    .ai-voice-btn{border:0;border-radius:50%;width:44px;height:44px;background:linear-gradient(135deg,#ec4899,#ef4444);color:#fff;font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+    .ai-voice-btn.listening{animation:pulse 1s infinite}
+    .ai-voice-btn.speaking{background:linear-gradient(135deg,#3b82f6,#6366f1)}
+    .ai-voice-row{display:flex;gap:8px;margin-top:10px;align-items:center}
+    .ai-voice-status{flex:1;font-size:12px;color:var(--muted);font-weight:700}
+    .ai-voice-controls{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;padding:10px;background:#f8fafc;border-radius:14px;border:1px solid var(--line)}
+    .ai-voice-controls label{font-size:11px;color:var(--muted);font-weight:800;display:block;margin-bottom:4px}
+    .ai-voice-controls select,.ai-voice-controls input[type=range]{width:100%;border:1px solid var(--line);border-radius:10px;padding:6px 8px;background:#fff;font-size:12px}
+    .ai-voice-col{flex:1;min-width:140px}
+    .ai-empty{padding:24px;text-align:center;color:var(--muted);font-size:13px}
+    .ai-empty b{display:block;color:var(--ink);font-size:14px;margin-bottom:6px}
+    .ai-suggest{padding:10px 12px;background:#fff;border:1px solid var(--line);border-radius:14px;font-size:13px;cursor:pointer;text-align:left;width:100%}
+    .ai-suggest:active{background:#f1f5f9}
+
+    /* Drive config modal */
+    .drive-modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:center;justify-content:center;z-index:55;padding:20px}
+    .drive-modal.open{display:flex}
+    .drive-card{background:#fff;border-radius:22px;padding:20px;max-width:480px;width:100%;box-shadow:0 20px 60px rgba(0,0,0,.3)}
+    .drive-card h3{margin:0 0 6px;font-size:18px}
+    .drive-card p{color:var(--muted);font-size:13px;margin:0 0 14px;line-height:1.5}
+    .drive-row{margin-bottom:10px}
+    .drive-row label{display:block;font-size:11px;color:var(--muted);font-weight:900;text-transform:uppercase;letter-spacing:.06em;margin-bottom:5px}
+    .drive-row input{width:100%;border:1px solid var(--line);border-radius:12px;padding:12px;background:#fff;font-size:13px;font-family:monospace}
+    .drive-actions{display:flex;gap:8px;margin-top:14px}
+    .drive-hint{background:var(--soft);border:1px solid #c7f0ed;border-radius:14px;padding:12px;font-size:12px;color:#0f766e;line-height:1.5;margin-top:10px}
+
+  </style>
+</head>
+<body>
+  <header class="top">
+    <div style="display:flex;justify-content:space-between;align-items:center;gap:10px">
+      <div></div>
+      <div style="flex:1;text-align:center">
+        <div class="brand">✦ TIFFANY &amp; CO.</div>
+        <div class="sub">POTANSİYEL MÜŞTERİ TAKİP <span style="opacity:.6">· v2 · AI · Drive</span></div>
+      </div>
+      <span class="sync-pill idle" id="sync-pill" title="Drive senkron durumu"><span class="dot"></span><span id="sync-text">yerel</span></span>
+    </div>
+  </header>
+  <main class="wrap">
+    <div class="switch"><button id="advisor-tab" class="active">Client Advisor</button><button id="todos-tab">To-Do Listesi</button><button id="manager-tab">Yönetici</button></div>
+
+    <section id="advisor" class="advisor active">
+      <div class="hero"><div class="hero-top"><div><h2>Bugünün öncelikleri</h2><div class="hint">Geciken + bugün takip + açık lead tek ekranda.</div></div><span class="pill" id="today-pill">0 iş</span></div></div>
+      <div class="grid" id="advisor-kpis"></div>
+      <div class="actions"><button class="btn tiffany" id="quick-add">Tek Tık Lead Ekle</button><button class="btn outline" id="show-today">Bugünküleri Göster</button><button class="btn light" id="ca-excel-report">CA Günlük Excel Rapor</button></div>
+      <div class="card" id="advisor-appt-card"><div class="section-title" style="margin-top:0"><h3>Bugünkü Appointmentlar</h3><span class="count" id="advisor-appt-count"></span></div><div class="mini-list" id="advisor-appt-list"></div></div>
+      <div class="card" id="advisor-todo-card"><div class="section-title" style="margin-top:0"><h3>Bugün Yapılacaklar</h3><span class="count" id="advisor-todo-count"></span></div><div class="todo-list" id="advisor-todo-list"></div><button class="todo-add-btn" id="open-todo-form">+ Yeni To-Do Ekle</button></div>
+      <div class="filters" id="quick-filters"></div>
+      <input class="search" id="search" placeholder="Müşteri adı, telefon, ürün, durum veya not ara..." />
+      <div class="selects"><select class="select" id="ca-filter"></select><select class="select" id="tag-filter"></select></div>
+      <div class="ca-tools"><button class="btn light" id="rename-ca">Seçili CA Adını Değiştir</button><div class="ca-rename-hint">CA filtresinden ismi seç, sonra bu butonla tüm müşterilerde güncelle.</div></div>
+      <div class="section-title"><h3>Lead Listesi</h3><span class="count" id="list-count"></span></div>
+      <div class="list" id="customer-list"></div>
+    </section>
+
+    <section id="todos" class="todos">
+      <div class="hero"><div class="hero-top"><div><h2>To-Do Listesi</h2><div class="hint">Tüm to-do'ların: bugün, yaklaşan, geciken ve tamamlananlar.</div></div><span class="pill" id="todos-pill">0 kayıt</span></div></div>
+      <div class="actions"><button class="btn tiffany" id="open-todo-form-2">+ Yeni To-Do Ekle</button></div>
+      <div class="filters" id="todo-filters"></div>
+      <div class="list" id="todo-list"></div>
+    </section>
+
+    <section id="manager" class="manager">
+      <div class="hero"><div class="hero-top"><div><h2>Yönetici Paneli</h2><div class="hint">Mağaza genel durum, aksiyon ve rapor.</div></div><span class="pill" id="manager-pill">Özet</span></div></div>
+      <div class="grid" id="manager-kpis"></div>
+      <div class="actions"><button class="btn tiffany" id="excel-report">Excel Rapor Paylaş</button><button class="btn light" id="copy-report">Metin Raporu Kopyala</button><button class="btn outline" id="open-drive">Drive Ayarları</button><button class="btn outline" id="open-aikey">🔑 AI Key Ayarları</button></div>
+      <div class="card"><div class="section-title" style="margin-top:0"><h3>Günlük Rapor</h3><span class="count" id="report-date"></span></div><div class="report" id="report-box"></div></div>
+      <div class="section-title"><h3>CA Performans</h3><span class="count">Satış / takip</span></div><div class="bars" id="ca-bars"></div>
+      <div class="section-title"><h3>Bugünkü Outreachler</h3><span class="count">Arama + WhatsApp</span></div><div class="bars" id="outreach-bars"></div>
+      <div class="section-title"><h3>Bugünkü Appointmentlar</h3><span class="count" id="manager-appt-count"></span></div><div class="list" id="manager-appt-list"></div>
+      <div class="section-title"><h3>Acil Liste</h3><span class="count">Geciken / bugün</span></div><div class="list" id="manager-list"></div>
+    </section>
+  </main>
+
+  <button class="bottom-add" id="float-add">+</button>
+  <button class="ai-fab" id="ai-fab" title="AI Danışman">✦</button>
+
+  <div class="modal" id="lead-modal"><div class="sheet"><div class="sheet-head"><h3 id="modal-title">Hızlı Lead</h3><button class="chip" id="close-modal">Kapat</button></div>
+    <form id="lead-form" class="form two">
+      <input type="hidden" name="id" />
+      <div class="field"><label>Ad Soyad</label><input class="input" name="name" required /></div>
+      <div class="field"><label>Telefon</label><input class="input" name="phone" required placeholder="05xx..." /></div>
+      <div class="field"><label>Ürün / SKU</label><input class="input" name="sku" placeholder="Knot ring / GRP..." /></div>
+      <div class="field"><label>Client Advisor</label><input class="input" name="advisor" id="advisor-input" list="advisor-list" required placeholder="CA adı" /><datalist id="advisor-list"></datalist></div>
+      <div class="field"><label>Müşteri Durumu</label><select class="select" name="status"><option value="new">Yeni müşteri</option><option value="contacted">İletişim kuruldu</option><option value="appointment">Appointment yapıldı</option><option value="followup">Takipte</option><option value="won">Satış yapıldı</option></select></div>
+      <div class="field"><label>Appointment Tarihi</label><input class="input" type="date" name="appointmentDate" /></div>
+      <div class="field"><label>Takip</label><select class="select" name="reminderPreset"><option value="today">Bugün</option><option value="tomorrow">Yarın</option><option value="3">3 gün sonra</option><option value="7">1 hafta sonra</option></select></div>
+      <div class="field"><label>Öncelik</label><select class="select" name="priority"><option value="normal">Normal</option><option value="vip">VIP</option></select></div>
+      <div class="field full"><label>Kısa Not</label><textarea class="textarea" name="note" placeholder="Hediye, kararsız, fiyat bekliyor..."></textarea></div>
+      <div class="full actions"><button type="button" class="btn light" id="cancel-form">Vazgeç</button><button class="btn tiffany" type="submit">Kaydet</button></div>
+    </form>
+  </div></div>
+  <div class="toast" id="toast"></div>
+
+  <div class="modal" id="todo-modal"><div class="sheet"><div class="sheet-head"><h3 id="todo-modal-title">Yeni To-Do</h3><button class="chip" id="close-todo-modal">Kapat</button></div>
+    <form id="todo-form" class="form two">
+      <div class="field full"><label>Müşteri</label><select class="select" name="customerId" required></select></div>
+      <div class="field full"><label>Yapılacak İş / Not</label><textarea class="textarea" name="text" required placeholder="Örn: Yellow gold alternatif fotoğraf at, fiyat teyit et..."></textarea></div>
+      <div class="field full"><label>Tarih</label><input class="input" type="date" name="dueDate" required /></div>
+      <div class="full actions"><button type="button" class="btn light" id="cancel-todo-form">Vazgeç</button><button class="btn tiffany" type="submit">Kaydet</button></div>
+    </form>
+  </div></div>
+
+  <!-- AI Modal -->
+  <div class="ai-modal" id="ai-modal">
+    <div class="ai-sheet">
+      <div class="ai-head">
+        <h3>✦ AI Danışman</h3>
+        <button class="chip" id="close-ai">Kapat</button>
+      </div>
+      <div class="ai-tabs">
+        <button class="ai-tab active" data-aitab="chat">💬 Yazışarak Sor</button>
+        <button class="ai-tab" data-aitab="voice">🎙️ Sesli Sohbet</button>
+      </div>
+
+      <!-- Chat tab -->
+      <div id="ai-chat-tab" style="display:flex;flex-direction:column;flex:1;min-height:0">
+        <div class="ai-msgs" id="ai-msgs">
+          <div class="ai-empty">
+            <b>Merhaba, ben senin CRM danışmanınım.</b>
+            Lead'lerin, randevu ve to-do'ların üzerinden sorular sorabilirsin.
+            <div style="margin-top:14px;display:grid;gap:8px">
+              <button class="ai-suggest" data-suggest="Bugün en önce hangi müşteriyi aramalıyım?">📞 Bugün en önce hangi müşteriyi aramalıyım?</button>
+              <button class="ai-suggest" data-suggest="Geciken takiplerim var mı, varsa kimler?">⏰ Geciken takiplerim var mı, kimler?</button>
+              <button class="ai-suggest" data-suggest="Bu hafta hangi günlerim boş, kaç appointment var?">📅 Bu hafta appointment yoğunluğu nasıl?</button>
+              <button class="ai-suggest" data-suggest="VIP müşterilerim için ne yapmam lazım?">💎 VIP müşteriler için öneri</button>
+            </div>
+          </div>
+        </div>
+        <div class="ai-input-row">
+          <textarea class="ai-input" id="ai-input" placeholder="Lead'lerin hakkında bir şey sor..." rows="1"></textarea>
+          <button class="ai-send" id="ai-send">Gönder</button>
+        </div>
+      </div>
+
+      <!-- Voice tab -->
+      <div id="ai-voice-tab" style="display:none;flex-direction:column;flex:1">
+        <div class="ai-msgs" id="ai-voice-msgs">
+          <div class="ai-empty">
+            <b>Sesli sohbet modu</b>
+            Mikrofon butonuna bas, Türkçe konuş — AI cevap verecek ve sesli okuyacak.
+          </div>
+        </div>
+        <div class="ai-voice-row">
+          <button class="ai-voice-btn" id="ai-voice-btn" title="Konuşmaya başla">🎙️</button>
+          <div class="ai-voice-status" id="ai-voice-status">Hazır — konuşmak için mikrofona dokun</div>
+        </div>
+        <div class="ai-voice-controls">
+          <div class="ai-voice-col">
+            <label>MinMax Ses (TTS)</label>
+            <select id="voice-minmax-id">
+              <option value="English_FriendlyPerson">English - FriendlyPerson</option>
+              <option value="English_Graceful_Lady">English - Graceful Lady</option>
+              <option value="English_PassionateWarrior">English - Passionate Warrior</option>
+              <option value="English_Comedian">English - Comedian</option>
+              <option value="English_Child">English - Child</option>
+              <option value="English_ConfidentMan">English - Confident Man</option>
+              <option value="English_Steady_Man">English - Steady Man</option>
+              <option value="Turkish_Calm_Woman">Turkish - Calm Woman</option>
+              <option value="Turkish_Deep_Voice_Man">Turkish - Deep Voice Man</option>
+            </select>
+          </div>
+          <div class="ai-voice-col">
+            <label>Hız: <span id="voice-speed-val">1.0</span>x</label>
+            <input type="range" id="voice-speed" min="0.5" max="1.5" step="0.1" value="1.0" />
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Drive Config Modal -->
+  <div class="drive-modal" id="drive-modal">
+    <div class="drive-card">
+      <h3>☁️ Drive Senkronizasyon</h3>
+      <p>Para takip uygulamasındakiyle aynı Apps Script kullanılır. Verilerin <code>tiffany_leads_v2</code> anahtarında ayrı tutulur — çakışma olmaz.</p>
+      <div class="drive-row">
+        <label>Apps Script Web App URL</label>
+        <input id="drive-url" placeholder="https://script.google.com/macros/s/AKfy.../exec" />
+      </div>
+      <div class="drive-row">
+        <label>Token (Apps Script'teki TOKEN değişkeni)</label>
+        <input id="drive-token" placeholder="örn: tiffany-secret-2024" />
+      </div>
+      <div class="drive-hint">
+        <b>💡 Kurulum:</b> Para takip uygulamasında kullanıyorsan aynı URL + token'ı yapıştır. Henüz kurmadıysan yardım iste — 5 dakikada kurulur.
+      </div>
+      <div class="drive-actions">
+        <button class="btn light" id="drive-cancel" style="flex:1">Vazgeç</button>
+        <button class="btn tiffany" id="drive-test" style="flex:1">Test Et & Kaydet</button>
+      </div>
+    </div>
+  </div>
+
+  <!-- AI Key Config Modal -->
+  <div class="drive-modal" id="aikey-modal">
+    <div class="drive-card">
+      <h3>🔑 MiniMax API Key</h3>
+      <p>AI özelliklerinin (analiz, sesli sohbet) çalışması için gerekli. Key sadece bu cihazda saklanır, koda gömülmez.</p>
+      <div class="drive-row">
+        <label>API Key</label>
+        <input id="aikey-input" type="password" placeholder="sk-... ile başlayan key" />
+      </div>
+      <div class="drive-hint" id="aikey-status"></div>
+      <div class="drive-actions">
+        <button class="btn light" id="aikey-cancel" style="flex:1">Vazgeç</button>
+        <button class="btn tiffany" id="aikey-save" style="flex:1">Kaydet</button>
+      </div>
+    </div>
+  </div>
+
+<script>
+// PWA Manifest (Para Takip'teki ile aynı yöntem — tek dosya, sunucuya ekstra dosya gerekmez)
+(function(){
+  var manifest={name:"Tiffany Lead Tracker",short_name:"Tiffany",start_url:".",display:"standalone",background_color:"#0b1f21",theme_color:"#81d8d0",description:"Tiffany & Co. Potansiyel Müşteri Takip",icons:[{src:"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 192 192'><rect width='192' height='192' rx='40' fill='%230a5456'/><text y='130' x='96' text-anchor='middle' font-size='110'>💎</text></svg>",sizes:"192x192",type:"image/svg+xml"},{src:"data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 512 512'><rect width='512' height='512' rx='100' fill='%230a5456'/><text y='360' x='256' text-anchor='middle' font-size='300'>💎</text></svg>",sizes:"512x512",type:"image/svg+xml"}]};
+  var mBlob=new Blob([JSON.stringify(manifest)],{type:'application/json'});
+  var mUrl=URL.createObjectURL(mBlob);
+  var ml=document.createElement('link');ml.rel='manifest';ml.href=mUrl;document.head.appendChild(ml);
+})();
+/* ============================================================
+   MinMax M3 AI ENTEGRASYONU (Para takip'ten port edildi)
+   ============================================================ */
+const AI_CONFIG={
+  apiKey:(function(){try{return localStorage.getItem("pk_ai_key")||""}catch(e){return""}})(),
+  endpoint:"https://api.minimax.io/v1/chat/completions",
+  ttsEndpoint:"https://api.minimax.io/v1/t2a_v2",
+  model:"MiniMax-M3",
+  ttsModel:"speech-2.8-hd"
+};
+
+function buildSystemPrompt(){
+  return "Sen 'Tiffany Lead Tracker' isimli Türkçe müşteri takip uygulamasında çalışan uzman bir CRM/satış danışmanısın. Görevin Client Advisor'lara (CA) lead takibinde yardım etmek.\n"+
+  "\n"+
+  "KULLANICI VERİSİNİ NASIL OKUMALISIN:\n"+
+  "- '=== TODAY\\'S DATA' veya '=== VERI' bölümleri sana gönderilen kullanıcının gerçek lead/todo/outreach verisidir.\n"+
+  "- Lead objeleri: {name, phone, status, priority, appointmentDate, reminder, outreachTotal, outreachToday, note, sku, advisor}\n"+
+  "- Status değerleri: 'new' (yeni), 'contacted' (iletişim kuruldu), 'appointment' (randevu), 'followup' (takipte), 'won' (satış)\n"+
+  "- bucket değerleri: 'overdue' (geciken), 'today' (bugün), 'appointment' (randevu), 'new' (yeni), 'won' (satış)\n"+
+  "- VIP müşteri = priority='vip'\n"+
+  "\n"+
+  "KURALLAR:\n"+
+  "- Kısa, samimi, profesyonel Türkçe yanıt ver. Maks 4-5 kısa cümle.\n"+
+  "- Somut müşteri adları, telefon numaraları ve tarihler ver.\n"+
+  "- 'Bugün en önce kimi aramalıyım' gibi sorularda bucket='overdue' olanları ve VIP'leri önce sırala.\n"+
+  "- Satış kapatma önerisi verirken müşterinin not/sku/etiket bilgisini kullan.\n"+
+  "- WhatsApp mesaj taslağı istenirse 2-3 kısa cümle, samimi, müşterinin adıyla başlayan bir mesaj yaz.\n"+
+  "- Düz metin olarak yanıt ver, markdown, başlık veya madde işareti KULLANMA.\n"+
+  "- Bilmiyorsan açıkça söyle, asla uydurma müşteri/tarih yazma.";
+}
+
+async function callMinMaxAI(messages){
+  if(!AI_CONFIG.apiKey){throw new Error("API key ayarlı değil. Yönetici Paneli → 🔑 AI Key Ayarları'ndan ekle.")}
+  const sys=buildSystemPrompt();
+  const payload={
+    model:AI_CONFIG.model,
+    messages:[{role:"system",content:sys}].concat(messages||[]),
+    temperature:0.7,
+    max_tokens:1024,
+    stream:false,
+    reasoning_split:true,
+    thinking:{type:"disabled"}
+  };
+  // 45 sn timeout — donup kalmasın
+  const ctrl=new AbortController();
+  const timer=setTimeout(()=>ctrl.abort(),45000);
+  let resp;
+  try{
+    resp=await fetch(AI_CONFIG.endpoint,{
+      method:"POST",
+      headers:{"Content-Type":"application/json","Authorization":"Bearer "+AI_CONFIG.apiKey},
+      body:JSON.stringify(payload),
+      signal:ctrl.signal
+    });
+  }catch(e){
+    clearTimeout(timer);
+    if(e.name==='AbortError')throw new Error("Zaman aşımı (45sn) — API yanıt vermedi. İnternet veya API key sorunlu olabilir.");
+    throw new Error("Ağ hatası: "+e.message+" (muhtemelen CORS veya internet bağlantısı)");
+  }
+  clearTimeout(timer);
+  if(!resp.ok){
+    let errText="";
+    try{errText=await resp.text()}catch(e){}
+    let msg="API "+(resp.status||"")+" hatası";
+    if(resp.status===401)msg+=" — API key geçersiz veya süresi dolmuş. Para takip uygulamasında da çalışıyor mu kontrol et.";
+    else if(resp.status===403)msg+=" — Erişim reddedildi (CORS veya key yetkisi).";
+    else if(resp.status===429)msg+=" — Çok fazla istek, biraz bekle.";
+    else if(resp.status>=500)msg+=" — Sunucu hatası, sonra tekrar dene.";
+    if(errText)msg+="\nDetay: "+errText.slice(0,200);
+    throw new Error(msg);
+  }
+  const data=await resp.json();
+  if(data&&data.choices&&data.choices[0]&&data.choices[0].message){
+    const msg=data.choices[0].message;
+    let text=msg.content||"";
+    text=text.replace(/<think>[\s\S]*?<\/think>/gi,"").trim();
+    if(!text&&msg.reasoning_details&&msg.reasoning_details[0]&&msg.reasoning_details[0].text){
+      text=msg.reasoning_details[0].text;
+    }
+    if(text)return text;
+    throw new Error("Boş yanıt");
+  }
+  throw new Error("Beklenmeyen yanıt formatı");
+}
+
+/* ============================================================
+   Drive Sync (Apps Script Web App, Para takip'le aynı sistem)
+   ============================================================ */
+const DRIVE_KEY_PREFIX="tiffany_drive";
+function _driveEnabled(){
+  try{return!!(localStorage.getItem(DRIVE_KEY_PREFIX+"_url")&&localStorage.getItem(DRIVE_KEY_PREFIX+"_token"))}catch(e){return false}
+}
+
+let _drivePushTimer=null;
+let _driveInterval=null;
+let _driveBooted=false;
+
+function buildCustomerSnapshot(){
+  // AI için özet — hassas veriyi (telefon) kısaltarak gönder
+  return state.customers.map(c=>({
+    name:c.name,
+    phone:c.phone?(c.phone.slice(0,4)+"***"+c.phone.slice(-2)):null,
+    status:c.status,
+    statusText:statusText(c.status),
+    priority:c.priority,
+    bucket:bucket(c),
+    appointmentDate:c.appointmentDate||null,
+    reminder:c.reminder||null,
+    outreachToday:outreachToday(c),
+    outreachTotal:Number(c.outreachTotal||0),
+    note:c.note||"",
+    sku:c.sku||"",
+    advisor:c.advisor||"",
+    tags:c.tags||[]
+  }));
+}
+
+function buildTodoSnapshot(){
+  return state.todos.map(t=>({
+    customerName:t.customerName,
+    text:t.text,
+    dueDate:t.dueDate,
+    done:t.done,
+    advisor:t.advisor||""
+  }));
+}
+
+function buildTodaySnapshot(){
+  // Bugünün verisini detaylı hazırla — AI'ın doğru yorum yapması için
+  const overdue=state.customers.filter(c=>bucket(c)==='overdue');
+  const today=state.customers.filter(c=>bucket(c)==='today');
+  const apptToday=state.customers.filter(c=>isTodayAppointment(c));
+  const vip=state.customers.filter(c=>c.priority==='vip');
+  const overdueTodos=state.todos.filter(t=>!t.done&&t.dueDate&&diff(t.dueDate)>0);
+  const todayTodos=state.todos.filter(t=>!t.done&&t.dueDate===today());
+  return {overdue, today, apptToday, vip, overdueTodos, todayTodos};
+}
+
+function buildFullSnapshot(){
+  return {customers:buildCustomerSnapshot(),todos:buildTodoSnapshot(),today:buildTodaySnapshot()};
+}
+
+async function drivePull(silent){
+  if(!_driveEnabled())return false;
+  if(syncStatus==="syncing")return false;
+  if(!silent)setSyncStatus("syncing");
+  try{
+    const url=localStorage.getItem(DRIVE_KEY_PREFIX+"_url")+"?token="+encodeURIComponent(localStorage.getItem(DRIVE_KEY_PREFIX+"_token"))+"&key=tiffany_leads_v2";
+    const res=await fetch(url,{method:"GET",cache:"no-store"});
+    const text=await res.text();
+    let json;
+    try{json=JSON.parse(text)}catch(e){setSyncStatus("error");return false}
+    if(json.ok&&typeof json.data==="string"&&json.data){
+      try{
+        const data=JSON.parse(json.data);
+        if(data&&Array.isArray(data.customers)){
+          state.customers=data.customers;
+          if(Array.isArray(data.todos))state.todos=data.todos;
+          save();
+          setLastSyncTs(Date.now());
+          setSyncStatus("ok");
+          if(typeof render==="function")render();
+          return true;
+        }
+      }catch(e){}
+    }
+    if(json.error==="unauthorized"){setSyncStatus("unauth");return false}
+    setSyncStatus("error");return false;
+  }catch(e){
+    setSyncStatus(silent?"idle":"offline");
+    return false;
+  }
+}
+
+async function drivePush(){
+  if(!_driveEnabled())return;
+  setSyncStatus("syncing");
+  try{
+    const payload={key:"tiffany_leads_v2",data:JSON.stringify({customers:state.customers,todos:state.todos})};
+    const res=await fetch(localStorage.getItem(DRIVE_KEY_PREFIX+"_url"),{
+      method:"POST",
+      headers:{"Content-Type":"text/plain;charset=utf-8"},
+      body:JSON.stringify(payload)
+    });
+    const text=await res.text();
+    let json;
+    try{json=JSON.parse(text)}catch(e){setSyncStatus("error");return}
+    if(json.ok){
+      setLastSyncTs(Date.now());
+      setSyncStatus("ok");
+    }else{
+      setSyncStatus(json.error==="unauthorized"?"unauth":"error");
+    }
+  }catch(e){
+    setSyncStatus("offline");
+  }
+}
+
+function drivePushDebounced(){
+  if(!_driveEnabled())return;
+  if(_drivePushTimer)clearTimeout(_drivePushTimer);
+  _drivePushTimer=setTimeout(drivePush,1500);
+}
+
+function driveSaveConfig(url,token){
+  try{
+    localStorage.setItem(DRIVE_KEY_PREFIX+"_url",url);
+    localStorage.setItem(DRIVE_KEY_PREFIX+"_token",token);
+    setSyncStatus("syncing");
+    setTimeout(async()=>{
+      await drivePush();
+      if(!_driveBooted){
+        _driveInterval=setInterval(()=>drivePull(true),30000);
+        _driveBooted=true;
+        setTimeout(()=>drivePull(true),800);
+      }
+    },400);
+    return true;
+  }catch(e){return false}
+}
+
+/* ============================================================
+   Voice Chat (sesli sohbet + TTS)
+   ============================================================ */
+const voiceMinMaxId=()=>document.getElementById('voice-minmax-id')?.value||localStorage.getItem('tiff_voice_id')||'English_FriendlyPerson';
+const voiceSpeed=()=>parseFloat(document.getElementById('voice-speed')?.value||localStorage.getItem('tiff_voice_speed')||'1.0');
+
+let _voiceRec=null;
+let _voiceBusy=false;
+let _voiceAudioEl=null;
+let _voiceLive=false;
+let _voiceListening=false;
+let _voiceSpeaking=false;
+let _voiceHistory=[];
+
+function _voiceStopSpeak(){
+  try{if(window.speechSynthesis)window.speechSynthesis.cancel()}catch(e){}
+  try{if(_voiceAudioEl){_voiceAudioEl.onended=null;_voiceAudioEl.pause();_voiceAudioEl.currentTime=0}}catch(e){}
+}
+
+async function _voiceSpeak(text){
+  if(!text)return;
+  if(!AI_CONFIG.apiKey){toast('API key ayarlı değil. AI Key Ayarları\'ndan ekle.');return}
+  try{
+    _voiceStopSpeak();
+    setVoiceSpeaking(true);
+    const body={
+      model:AI_CONFIG.ttsModel||"speech-2.8-hd",
+      text:text,
+      stream:false,
+      voice_setting:{voice_id:voiceMinMaxId(),speed:voiceSpeed(),vol:1.0,pitch:0},
+      audio_setting:{sample_rate:32000,bitrate:128000,format:"mp3",channel:1}
+    };
+    const res=await fetch(AI_CONFIG.ttsEndpoint,{
+      method:"POST",
+      headers:{"Content-Type":"application/json","Authorization":"Bearer "+AI_CONFIG.apiKey},
+      body:JSON.stringify(body)
+    });
+    if(!res.ok){setVoiceSpeaking(false);return;}
+    let blob;
+    const ct=res.headers.get("content-type")||"";
+    if(ct.indexOf("application/json")>=0){
+      const data=await res.json();
+      const audioHex=(data&&typeof data.audio==="string"&&data.audio)||(data&&data.data&&typeof data.data.audio==="string"&&data.data.audio)||"";
+      const audioTypeRaw=(data&&data.audio_type)||(data&&data.data&&data.data.audio_type)||"";
+      if(audioHex){
+        const hex=audioHex;
+        const arr=new Uint8Array(Math.floor(hex.length/2));
+        for(let i=0;i<hex.length;i+=2)arr[i/2]=parseInt(hex.substr(i,2),16);
+        const audioType=(audioTypeRaw==="wav"||audioTypeRaw==="pcm")?"audio/wav":"audio/mpeg";
+        blob=new Blob([arr],{type:audioType});
+      }else{setVoiceSpeaking(false);return;}
+    }else{
+      blob=await res.blob();
+    }
+    if(!blob){setVoiceSpeaking(false);return;}
+    const url=URL.createObjectURL(blob);
+    if(!_voiceAudioEl)_voiceAudioEl=new Audio();
+    const audioEl=_voiceAudioEl;
+    audioEl.src=url;
+    audioEl.onended=()=>{
+      setVoiceSpeaking(false);
+      try{URL.revokeObjectURL(url)}catch(e){}
+      if(_voiceLive&&!_voiceListening)setTimeout(()=>{if(_voiceLive&&!_voiceListening)_voiceStartRec()},300);
+    };
+    audioEl.onerror=()=>setVoiceSpeaking(false);
+    await audioEl.play().catch(()=>setVoiceSpeaking(false));
+  }catch(e){
+    setVoiceSpeaking(false);
+  }
+}
+
+function _voiceStartRec(){
+  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
+  if(!SR){setVoiceStatus("Bu tarayıcı sesli girişi desteklemiyor. Chrome/Edge kullan.");return;}
+  if(_voiceRec){try{_voiceRec.abort()}catch(e){}_voiceRec=null;}
+  try{
+    const rec=new SR();
+    _voiceRec=rec;
+    rec.lang="tr-TR";
+    rec.continuous=false;
+    rec.interimResults=false;
+    setVoiceListening(true);
+    setVoiceStatus("🎤 Dinliyorum...");
+    rec.onresult=(ev)=>{
+      const final=ev.results[ev.results.length-1][0].transcript;
+      if(final)_voiceAskAI(final);
+    };
+    rec.onerror=(ev)=>{
+      setVoiceListening(false);
+      if(ev.error==="no-speech")setVoiceStatus("Ses algılanmadı, tekrar dene");
+      else if(ev.error==="not-allowed")setVoiceStatus("Mikrofon izni verilmedi");
+      else setVoiceStatus("Hata: "+ev.error);
+    };
+    rec.onend=()=>{
+      setVoiceListening(false);
+      if(_voiceLive&&!_voiceSpeaking){
+        // kullanıcı sustu, otomatik tekrar başlat (live mode)
+        setTimeout(()=>{if(_voiceLive&&!_voiceListening&&!_voiceSpeaking)_voiceStartRec()},400);
+      }
+    };
+    rec.start();
+  }catch(e){
+    setVoiceStatus("Başlatılamadı: "+String(e));
+    setVoiceListening(false);
+  }
+}
+
+function _voiceStopRec(){
+  if(_voiceRec){try{_voiceRec.abort()}catch(e){}_voiceRec=null;}
+  setVoiceListening(false);
+}
+
+function _voiceToggleLive(){
+  _voiceLive=!_voiceLive;
+  const fab=document.getElementById('ai-fab');
+  const btn=document.getElementById('ai-voice-btn');
+  if(_voiceLive){
+    fab?.classList.add('voice-live');
+    btn?.classList.add('listening');
+    setVoiceStatus("🔴 Canlı — konuşabilirsin");
+    _voiceStartRec();
+  }else{
+    fab?.classList.remove('voice-live');
+    btn?.classList.remove('listening');
+    _voiceStopRec();
+    _voiceStopSpeak();
+    setVoiceStatus("Hazır — konuşmak için mikrofona dokun");
+  }
+}
+
+async function _voiceAskAI(text){
+  if(_voiceBusy||!text)return;
+  _voiceBusy=true;
+  pushVoiceMsg("user",text);
+  const messages=_voiceHistory.concat([{role:"user",content:text}]);
+  const snap=buildFullSnapshot();
+  const sysExtra="\n\n=== VERI (snapshot) ===\n"+JSON.stringify(snap).slice(0,12000);
+  const aiMessages=[{role:"system",content:buildSystemPrompt()+sysExtra}].concat(messages);
+  try{
+    const reply=await callMinMaxAI(messages);
+    _voiceHistory.push({role:"user",content:text},{role:"assistant",content:reply});
+    if(_voiceHistory.length>20)_voiceHistory=_voiceHistory.slice(-20);
+    pushVoiceMsg("bot",reply);
+    await _voiceSpeak(reply);
+  }catch(e){
+    pushVoiceMsg("error","Hata: "+String(e));
+  }finally{
+    _voiceBusy=false;
+  }
+}
+
+function setVoiceListening(v){_voiceListening=v;updateVoiceBtn();}
+function setVoiceSpeaking(v){_voiceSpeaking=v;updateVoiceBtn();}
+function updateVoiceBtn(){
+  const btn=document.getElementById('ai-voice-btn');
+  if(!btn)return;
+  if(_voiceListening){btn.classList.add('listening');btn.classList.remove('speaking');btn.textContent='🎤';}
+  else if(_voiceSpeaking){btn.classList.remove('listening');btn.classList.add('speaking');btn.textContent='🔊';}
+  else{btn.classList.remove('listening');btn.classList.remove('speaking');btn.textContent='🎙️';}
+}
+function setVoiceStatus(s){const el=document.getElementById('ai-voice-status');if(el)el.textContent=s;}
+function pushVoiceMsg(role,text){
+  const box=document.getElementById('ai-voice-msgs');
+  if(!box)return;
+  // Boş durumu temizle
+  const empty=box.querySelector('.ai-empty');
+  if(empty)empty.remove();
+  const div=document.createElement('div');
+  div.className='ai-msg '+(role==='user'?'user':role==='error'?'error':'bot');
+  div.textContent=text;
+  box.appendChild(div);
+  box.scrollTop=box.scrollHeight;
+}
+
+/* ============================================================
+   Chat (yazışarak AI)
+   ============================================================ */
+let _aiChatHistory=[];
+let _aiBusy=false;
+
+function pushChatMsg(role,text){
+  const box=document.getElementById('ai-msgs');
+  if(!box)return;
+  const empty=box.querySelector('.ai-empty');
+  if(empty&&role!=='thinking')empty.remove();
+  const div=document.createElement('div');
+  div.className='ai-msg '+(role==='user'?'user':role==='error'?'error':role==='thinking'?'bot thinking':'bot');
+  div.textContent=text;
+  box.appendChild(div);
+  box.scrollTop=box.scrollHeight;
+  return div;
+}
+
+async function aiSend(text){
+  text=(text||'').trim();
+  if(!text||_aiBusy)return;
+  _aiBusy=true;
+  const sendBtn=document.getElementById('ai-send');
+  if(sendBtn)sendBtn.disabled=true;
+  pushChatMsg('user',text);
+  const thinkEl=pushChatMsg('thinking','Düşünüyor');
+  thinkEl.innerHTML='<span class="ai-typing"><span></span><span></span><span></span></span>';
+  const messages=_aiChatHistory.concat([{role:"user",content:text}]);
+  const snap=buildFullSnapshot();
+  const sysExtra="\n\n=== VERI (snapshot) ===\n"+JSON.stringify(snap).slice(0,12000);
+  const aiMessages=[{role:"system",content:buildSystemPrompt()+sysExtra}].concat(messages);
+  try{
+    const reply=await callMinMaxAI(messages);
+    thinkEl.remove();
+    pushChatMsg('bot',reply);
+    _aiChatHistory.push({role:"user",content:text},{role:"assistant",content:reply});
+    if(_aiChatHistory.length>20)_aiChatHistory=_aiChatHistory.slice(-20);
+  }catch(e){
+    thinkEl.remove();
+    pushChatMsg('error',"Hata: "+String(e));
+  }finally{
+    _aiBusy=false;
+    if(sendBtn)sendBtn.disabled=false;
+  }
+}
+
+function openAIModal(){
+  document.getElementById('ai-modal').classList.add('open');
+  setTimeout(()=>document.getElementById('ai-input')?.focus(),100);
+}
+function closeAIModal(){
+  document.getElementById('ai-modal').classList.remove('open');
+  if(_voiceLive)_voiceToggleLive();
+}
+function setAITab(name){
+  document.querySelectorAll('.ai-tab').forEach(b=>b.classList.toggle('active',b.dataset.aitab===name));
+  document.getElementById('ai-chat-tab').style.display=name==='chat'?'flex':'none';
+  document.getElementById('ai-voice-tab').style.display=name==='voice'?'flex':'none';
+  if(name!=='voice'&&_voiceLive)_voiceToggleLive();
+}
+
+/* ============================================================
+   Sync pill UI
+   ============================================================ */
+function setSyncStatus(s){
+  syncStatus=s;
+  const pill=document.getElementById('sync-pill');
+  const text=document.getElementById('sync-text');
+  if(!pill||!text)return;
+  pill.classList.remove('ok','syncing','error','offline','unauth','idle');
+  pill.classList.add(s);
+  text.textContent={ok:'senkron',syncing:'senkron...',error:'hata',offline:'çevrimdışı',unauth:'token?',idle:'yerel'}[s]||s;
+}
+function setLastSyncTs(ts){lastSyncTs=ts;}
+
+/* ============================================================
+   ORİJİNAL UYGULAMA KODU (değiştirilmemiş — mevcut lead'ler korunur)
+   ============================================================ */
+const KEY='tiffany-clean-ui-v2';
+const ADVISORS=['Safa'];
+let state={mode:'advisor',filter:'open',todoFilter:'pending',search:'',ca:'all',tag:'all',editing:null,customers:[],todos:[],todoEditing:null};
+let syncStatus='idle';
+let lastSyncTs=0;
+
+const todayFn=()=>{const d=new Date();return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
+const today=todayFn;
+const addDays=(n,base=today())=>{const d=new Date(base+'T00:00:00');d.setDate(d.getDate()+n);return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`};
+const diff=(date)=>Math.round((new Date(today()+'T00:00:00')-new Date((date||today())+'T00:00:00'))/86400000);
+const fmt=(v)=>v?new Date(v+'T00:00:00').toLocaleDateString('tr-TR'):'-';
+function load(){try{if(localStorage.getItem('tiffany-clean-ui-v1')!==null)localStorage.removeItem('tiffany-clean-ui-v1');if(localStorage.getItem('tiffany-clean-ui-v1-todos')!==null)localStorage.removeItem('tiffany-clean-ui-v1-todos')}catch{} let raw=null;try{raw=JSON.parse(localStorage.getItem(KEY))}catch{} state.customers=Array.isArray(raw)?raw:[]; state.customers=state.customers.map(c=>({...c,priority:c.priority==='vip'?'vip':'normal',appointmentDate:c.appointmentDate||(c.status==='appointment'?(c.reminder||today()):''),outreachTotal:Number(c.outreachTotal||0),outreachToday:Number(c.outreachDate===today()?c.outreachToday||0:0),outreachDate:c.outreachDate===today()?c.outreachDate:today()})); try{const td=JSON.parse(localStorage.getItem(KEY+'-todos')||'[]');state.todos=Array.isArray(td)?td.map(t=>({id:String(t.id),customerId:String(t.customerId||''),customerName:String(t.customerName||''),advisor:String(t.advisor||''),text:String(t.text||''),dueDate:String(t.dueDate||today()),done:!!t.done,createdAt:String(t.createdAt||today())})):[]}catch{state.todos=[]} save()}
+function save(){localStorage.setItem(KEY,JSON.stringify(state.customers));localStorage.setItem(KEY+'-todos',JSON.stringify(state.todos));drivePushDebounced();}
+function toast(t){const el=document.getElementById('toast');el.textContent=t;el.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>el.classList.remove('show'),2300)}
+function apptDate(c){return c.appointmentDate||''}
+function isTodayAppointment(c){return c.status==='appointment'&&apptDate(c)===today()}
+function bucket(c){if(c.status==='won')return'won'; if(isTodayAppointment(c))return'appointment'; if(c.reminder&&diff(c.reminder)>0)return'overdue'; if(c.reminder===today())return'today'; if(c.status==='appointment')return'appointment'; if(c.status==='new')return'new'; return'all'}
+function nextAction(c){if(c.status==='won')return 'Teşekkür mesajı at, müşteri ilişkisini koru.';if(bucket(c)==='overdue')return 'Gecikmiş takip: şimdi WhatsApp veya ara.';if(c.status==='new')return 'İlk temas: WhatsApp ile hızlı dönüş yap.';if(c.status==='contacted')return 'Appointment öner ve uygun saat netleştir.';if(c.status==='appointment')return apptDate(c)===today()?'Bugünkü appointment: müşteri gelmeden önce teyit et.':`Appointment tarihi: ${fmt(apptDate(c))}. Tarihten önce teyit et.`;return 'Takipte: randevu veya ayırma öner.'}
+function metrics(){const cs=state.customers;return{total:cs.length,new:cs.filter(c=>c.status==='new').length,today:cs.filter(c=>bucket(c)==='today').length,overdue:cs.filter(c=>bucket(c)==='overdue').length,won:cs.filter(c=>c.status==='won').length,contacted:cs.filter(c=>c.status==='contacted').length,followup:cs.filter(c=>c.status==='followup').length,appointment:cs.filter(c=>c.status==='appointment').length,appointmentToday:cs.filter(c=>isTodayAppointment(c)).length,open:cs.filter(c=>c.status!=='won').length}}
+function outreachToday(c){return c.outreachDate===today()?Number(c.outreachToday||0):0}
+function outreachByAdvisor(){const names=[...new Set([...ADVISORS,...unique('advisor')])];return names.map(n=>{const cs=state.customers.filter(c=>c.advisor===n);return {advisor:n,total:cs.reduce((a,c)=>a+outreachToday(c),0),customers:cs.filter(c=>outreachToday(c)>0).length}}).filter(x=>x.total>0||state.customers.some(c=>c.advisor===x.advisor))}
+function unique(k){return [...new Set(state.customers.map(c=>c[k]).filter(Boolean))]}
+function allTags(){return [...new Set(state.customers.flatMap(c=>c.tags||[]))]}
+function normalizeAdvisorName(v){return String(v||'').trim()==='Ece'?'Safa':(String(v||'').trim()||'Safa')}
+function normalizeAdvisors(){let changed=false;state.customers=state.customers.map(c=>{const advisor=normalizeAdvisorName(c.advisor);if(advisor!==c.advisor){changed=true;return {...c,advisor,history:[...(c.history||[]),'CA Safa olarak güncellendi']}}return c});if(changed)save()}
+function renderAdvisorOptions(selected){const dl=document.getElementById('advisor-list');if(!dl)return;const names=[...new Set([...ADVISORS,...unique('advisor').filter(n=>n!=='Ece')])];dl.innerHTML=names.map(n=>`<option value="${n}"></option>`).join('')}
+function normalizeText(v){return String(v||'').toLocaleLowerCase('tr').trim()}
+function filtered(){
+ const q=normalizeText(state.search);
+ return state.customers.filter(c=>{
+  const searchText=normalizeText([c.name,c.phone,c.sku,c.note,statusText(c.status),fmt(apptDate(c)),(c.tags||[]).join(' ')].join(' '));
+  const matches=!q||searchText.includes(q);
+  const f=q?true:(state.filter==='all'||bucket(c)===state.filter||c.status===state.filter||(state.filter==='open'&&c.status!=='won')||(state.filter==='vip'&&c.priority==='vip'));
+  const ca=state.ca==='all'||c.advisor===state.ca;
+  const tag=state.tag==='all'||(c.tags||[]).includes(state.tag);
+  return matches&&f&&ca&&tag;
+ }).sort((a,b)=>{const ba=bucket(a),bb=bucket(b);const order={overdue:0,today:1,appointment:2,new:3,all:4,won:5};return (order[ba]??4)-(order[bb]??4)})
+}
+function statusText(s){return{new:'Yeni müşteri',contacted:'İletişim kuruldu',appointment:'Appointment yapıldı',followup:'Takipte',won:'Satış yapıldı'}[s]||s}
+function cls(c){if(bucket(c)==='overdue')return'overdue';if(c.status==='won')return'status-won';if(c.status==='appointment')return'status-appointment';if(c.status==='contacted')return'status-contacted';if(c.status==='new')return'status-new';if(c.priority==='vip')return'vip';return''}
+function card(c,manager=false){const appt=c.status==='appointment'&&apptDate(c)?`<div class="appointment-line">📅 Appointment: ${fmt(apptDate(c))}</div>`:'';const outreach=`<div class="outreach-line">📞 Bugünkü outreach: ${outreachToday(c)} • Toplam: ${Number(c.outreachTotal||0)}</div>`;return `<div class="card ${cls(c)}"><div class="card-top"><div><div class="name">${c.name}<span class="status-badge ${c.status}">${statusText(c.status)}</span></div><div class="meta">${c.phone||''} ${c.advisor?`• ${c.advisor}`:''} ${c.priority==='vip'?'• 💎 VIP':''}</div></div><div style="font-size:18px">${c.priority==='vip'?'💎':''}</div></div>${c.sku?`<div class="product">Ürün: ${c.sku}</div>`:''}${appt}${outreach}<div class="next">🎯 ${nextAction(c)}</div><div class="row"><button class="mini primary" data-wa="${c.id}">WhatsApp</button><button class="mini dark" data-call="${c.id}">Ara</button><button class="mini green" data-appointment="${c.id}">App.</button>${!manager?`<button class="mini" data-snooze="${c.id}">+3g</button><button class="mini" data-edit="${c.id}">Düzenle</button><button class="mini" data-delete="${c.id}" style="background:#fee2e2;color:#991b1b;border-color:#fee2e2">Sil</button>`:`<button class="mini" data-done="${c.id}">✓ Satış</button><button class="mini" data-edit="${c.id}">Düzenle</button>`}</div><details class="details"><summary>Detay & notlar</summary><div class="details-body">${c.note?`<div class="note">${c.note}</div>`:''}<div class="mini-list">${(c.history||[]).slice(-5).reverse().map(h=>`<div class="mini-item"><b>${h}</b></div>`).join('')||'<div class="mini-item"><span>Henüz hareket yok</span></div>'}</div></div></details></div>`}
+function render(){
+ document.querySelectorAll('.switch button').forEach(b=>b.classList.toggle('active',b.id===(state.mode==='advisor'?'advisor-tab':state.mode==='todos'?'todos-tab':'manager-tab')));
+ document.getElementById('advisor').classList.toggle('active',state.mode==='advisor');
+ document.getElementById('todos').classList.toggle('active',state.mode==='todos');
+ document.getElementById('manager').classList.toggle('active',state.mode==='manager');
+ const m=metrics();const advisorOutreach=outreachByAdvisor().reduce((a,r)=>a+r.total,0);document.getElementById('advisor-kpis').innerHTML=`<div class="kpi"><b>${m.open}</b><span>Açık Lead</span></div><div class="kpi danger"><b>${m.overdue}</b><span>Geciken</span></div><div class="kpi warn"><b>${m.appointmentToday}</b><span>Bugünkü App.</span></div><div class="kpi ok"><b>${advisorOutreach}</b><span>Bugünkü Outreach</span></div>`;
+ const advisorAppts=todayAppointments(state.ca);document.getElementById('advisor-appt-count').textContent=`${advisorAppts.length} adet`;document.getElementById('advisor-appt-list').innerHTML=renderAppointmentList(advisorAppts);renderAdvisorTodos();if(state.mode==='todos')renderTodosView();
+ const filters=[['open','Açık'],['today','Bugün'],['overdue','Geciken'],['new','Yeni'],['contacted','İletişim'],['appointment','Appointment'],['vip','VIP'],['won','Satış'],['all','Tümü']];document.getElementById('quick-filters').innerHTML=filters.map(([id,l])=>`<button class="chip ${state.filter===id?'active':''}" data-filter="${id}">${l}</button>`).join('');
+ document.getElementById('ca-filter').innerHTML=`<option value="all">Tüm CA</option>`+unique('advisor').filter(v=>v!=='Ece').map(v=>`<option ${state.ca===v?'selected':''}>${v}</option>`).join('');document.getElementById('tag-filter').innerHTML=`<option value="all">Tüm Etiket</option>`+allTags().map(v=>`<option ${state.tag===v?'selected':''}>${v}</option>`).join('');
+ const list=filtered();document.getElementById('list-count').textContent=`${list.length} lead`;document.getElementById('customer-list').innerHTML=list.length?list.map(c=>card(c)).join(''):`<div class="card"><div class="hint">Bu filtrede lead yok.</div></div>`;
+ const managerAppts=todayAppointments('all');const totalOutreach=state.customers.reduce((a,c)=>a+outreachToday(c),0);document.getElementById('manager-kpis').innerHTML=`<div class="kpi"><b>${m.total}</b><span>Toplam</span></div><div class="kpi warn"><b>${m.appointmentToday}</b><span>Bugünkü App.</span></div><div class="kpi ok"><b>${totalOutreach}</b><span>Bugünkü Outreach</span></div>`;document.getElementById('manager-pill').textContent=`${m.appointmentToday} bugünkü appointment`;document.getElementById('report-date').textContent=new Date().toLocaleDateString('tr-TR');document.getElementById('report-box').textContent=reportText();renderBars();renderOutreachBars();document.getElementById('manager-appt-count').textContent=`${managerAppts.length} adet`;document.getElementById('manager-appt-list').innerHTML=managerAppts.length?managerAppts.map(c=>card(c,true)).join(''):`<div class="card"><div class="hint">Bugün appointment yok.</div></div>`;document.getElementById('manager-list').innerHTML=state.customers.filter(c=>bucket(c)==='overdue'||bucket(c)==='today').sort((a,b)=>filtered().indexOf(a)-filtered().indexOf(b)).map(c=>card(c,true)).join('')||`<div class="card"><div class="hint">Acil lead yok.</div></div>`;bindDynamic()
+}
+function todayAppointments(ca){return state.customers.filter(c=>isTodayAppointment(c)&&(ca==='all'||c.advisor===ca))}
+function renderAppointmentList(list){return list.length?list.map(c=>`<div class="mini-item"><b>${c.name}</b><span>${c.advisor||'-'} • ${c.sku||'ürün yok'} • ${c.phone||''}</span></div>`).join(''):'<div class="mini-item"><span>Bugün appointment yok.</span></div>'}
+function renderBars(){const names=unique('advisor');const max=Math.max(1,...names.map(n=>state.customers.filter(c=>c.advisor===n).length));document.getElementById('ca-bars').innerHTML=names.map(n=>{const total=state.customers.filter(c=>c.advisor===n).length;const won=state.customers.filter(c=>c.advisor===n&&c.status==='won').length;return `<div class="bar-row"><div class="bar-label"><span>${n}</span><span>${won} satış / ${total} lead</span></div><div class="bar"><i style="width:${Math.max(8,total/max*100)}%"></i></div></div>`}).join('')||`<div class="card"><div class="hint">CA verisi yok.</div></div>`}
+function renderOutreachBars(){const rows=outreachByAdvisor();const max=Math.max(1,...rows.map(r=>r.total));document.getElementById('outreach-bars').innerHTML=rows.map(r=>`<div class="bar-row"><div class="bar-label"><span>${r.advisor}</span><span>${r.total} outreach / ${r.customers} müşteri</span></div><div class="bar"><i style="width:${Math.max(8,r.total/max*100)}%"></i></div></div>`).join('')||`<div class="card"><div class="hint">Bugün outreach yok.</div></div>`}
+function reportText(){const m=metrics();const urgent=state.customers.filter(c=>bucket(c)==='overdue'||bucket(c)==='today').slice(0,8);const appts=todayAppointments('all');const outreach=outreachByAdvisor();const totalOutreach=state.customers.reduce((a,c)=>a+outreachToday(c),0);return `TIFFANY LEAD TRACKER - GÜNLÜK ÖZET
+
+Toplam lead: ${m.total}
+Yeni lead: ${m.new}
+Bugün takip: ${m.today}
+Geciken takip: ${m.overdue}
+Toplam appointment: ${m.appointment}
+Bugünkü appointment: ${m.appointmentToday}
+Satışa dönen: ${m.won}
+Bugünkü outreach: ${totalOutreach}
+
+Bugünkü outreachler:
+${outreach.length?outreach.map(o=>`- ${o.advisor}: ${o.total} outreach / ${o.customers} müşteri`).join('\n'):'- Yok'}
+
+Bugünkü appointmentlar:
+${appts.length?appts.map(c=>`- ${c.name} / ${c.advisor||'-'} / ${c.phone||'-'} / ${c.sku||'-'}`).join('\n'):'- Yok'}
+
+Öncelikli müşteriler:
+${urgent.length?urgent.map(c=>`- ${c.name} / ${c.advisor||'-'} / ${statusText(c.status)} / ${nextAction(c)}`).join('\n'):'- Yok'}
+
+Bugünün aksiyonu:
+${m.appointmentToday>0?'Bugünkü appointmentlar teyit edilmeli.':m.overdue>0?'Geciken müşterilere hemen dönüş yapılmalı.':m.today>0?'Bugünkü takipler tamamlanmalı.':'Acil takip görünmüyor.'}`}
+function excelRows(){return state.customers.map(c=>({
+ 'Müşteri ID':c.id||'',
+ 'Ad Soyad':c.name||'',
+ 'Telefon':c.phone||'',
+ 'Ürün / SKU':c.sku||'',
+ 'Client Advisor':c.advisor||'',
+ 'Durum':statusText(c.status),
+ 'Öncelik':c.priority==='vip'?'VIP':'Normal',
+ 'Ziyaret / Kayıt Tarihi':fmt(c.visitDate),
+ 'Takip Tarihi':fmt(c.reminder),
+ 'Appointment Tarihi':fmt(apptDate(c)),
+ 'Bugünkü Appointment':isTodayAppointment(c)?'Evet':'Hayır',
+ 'Bugünkü Outreach':outreachToday(c),
+ 'Toplam Outreach':Number(c.outreachTotal||0),
+ 'Son Outreach Tarihi':c.outreachTotal?fmt(c.outreachDate):'-',
+ 'Etiketler':(c.tags||[]).join(', '),
+ 'Müşteri Notu':c.note||'',
+ 'Önerilen Aksiyon':nextAction(c),
+ 'Geçmiş / Detay':(c.history||[]).join(' → ')
+}))}
+function excelHtml(){const rows=excelRows();const cols=Object.keys(rows[0]||{'Ad Soyad':''});const esc=v=>String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');return `<html><head><meta charset="UTF-8"><style>td,th{mso-number-format:"\\@";white-space:pre-wrap;vertical-align:top</style></head><body><h3>Yönetici Detaylı Günlük Rapor</h3><table border="1"><thead><tr>${cols.map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${rows.map(r=>`<tr>${cols.map(c=>`<td>${esc(r[c])}</td>`).join('')}</tr>`).join('')}</tbody></table></body></html>`}
+async function shareExcelReport(){const blob=new Blob([excelHtml()],{type:'application/vnd.ms-excel'});const fileName=`tiffany-gunluk-rapor-${today()}.xls`;const file=new File([blob],fileName,{type:'application/vnd.ms-excel'});try{if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:'Tiffany Günlük Rapor',text:'Günlük müşteri takip raporu'});toast('Excel rapor paylaşıldı.');return}}catch(e){}const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fileName;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000);toast('Excel rapor indirildi.')}
+function caReportCustomers(){const ca=state.ca&&state.ca!=='all'?state.ca:null;let list=ca?state.customers.filter(c=>c.advisor===ca):state.customers.slice();return list.sort((a,b)=>{const at=isTodayAppointment(a)?0:1;const bt=isTodayAppointment(b)?0:1;return at-bt||String(a.name||'').localeCompare(String(b.name||''),'tr')})}
+function caExcelRows(){return caReportCustomers().map(c=>({
+ 'Rapor Tarihi':fmt(today()),
+ 'Client Advisor':c.advisor||'',
+ 'Müşteri Adı':c.name||'',
+ 'Telefon':c.phone||'',
+ 'Ürün / SKU':c.sku||'',
+ 'Durum':statusText(c.status),
+ 'Kayıt Tarihi':fmt(c.visitDate),
+ 'Takip Tarihi':fmt(c.reminder),
+ 'Appointment Tarihi':fmt(apptDate(c)),
+ 'Bugünkü Appointment':isTodayAppointment(c)?'Evet':'Hayır',
+ 'Bugünkü Outreach':outreachToday(c),
+ 'Toplam Outreach':Number(c.outreachTotal||0),
+ 'Son Outreach Tarihi':c.outreachTotal?fmt(c.outreachDate):'-',
+ 'Satış Yapıldı mı':c.status==='won'?'Evet':'Hayır',
+ 'Müşteri Notu / Detay':c.note||'',
+ 'Geçmiş Kayıtları':(c.history||[]).join(' | '),
+ 'Etiketler':(c.tags||[]).join(', '),
+ 'Önerilen Aksiyon':nextAction(c),
+ 'Müşteri ID':c.id||''
+}))}
+function caExcelSummaryRows(){const rows=caReportCustomers();const names=[...new Set(rows.map(c=>c.advisor||'CA yok'))];return names.map(n=>{const items=rows.filter(c=>(c.advisor||'CA yok')===n);return {
+ 'Rapor Tarihi':fmt(today()),
+ 'Client Advisor':n,
+ 'Toplam Lead':items.length,
+ 'Bugünkü Appointment':items.filter(isTodayAppointment).length,
+ 'Bugünkü Outreach':items.reduce((a,c)=>a+outreachToday(c),0),
+ 'Satış':items.filter(c=>c.status==='won').length,
+ 'Geciken Takip':items.filter(c=>bucket(c)==='overdue').length
+ }})}
+function tableHtml(rows){const cols=Object.keys(rows[0]||{'Bilgi':'Kayıt yok'});const esc=v=>String(v??'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;');return `<table border="1"><thead><tr>${cols.map(c=>`<th>${esc(c)}</th>`).join('')}</tr></thead><tbody>${rows.length?rows.map(r=>`<tr>${cols.map(c=>`<td>${esc(r[c])}</td>`).join('')}</tr>`).join(''):`<tr><td>Kayıt yok</td></tr>`}</tbody></table>`}
+function caExcelHtml(){return `<html><head><meta charset="UTF-8"><style>td,th{mso-number-format:"\\@";white-space:pre-wrap;vertical-align:top</style></head><body><h3>Müşteri Detaylı CA Günlük Raporu</h3>${tableHtml(caExcelRows())}<br><h3>CA Günlük Özet</h3>${tableHtml(caExcelSummaryRows())}</body></html>`}
+async function shareCaExcelReport(){const caName=(state.ca&&state.ca!=='all'?state.ca:'tum-ca').toLocaleLowerCase('tr').replace(/[^a-z0-9ğüşöçıİĞÜŞÖÇ]+/gi,'-');const blob=new Blob([caExcelHtml()],{type:'application/vnd.ms-excel'});const fileName=`ca-gunluk-rapor-${caName}-${today()}.xls`;const file=new File([blob],fileName,{type:'application/vnd.ms-excel'});try{if(navigator.canShare&&navigator.canShare({files:[file]})){await navigator.share({files:[file],title:'CA Günlük Excel Rapor',text:'CA günlük müşteri takip raporu'});toast('CA Excel raporu paylaşıldı.');return}}catch(e){}const a=document.createElement('a');a.href=URL.createObjectURL(blob);a.download=fileName;document.body.appendChild(a);a.click();setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},1000);toast('CA Excel raporu indirildi.')}
+
+function openForm(c){const f=document.getElementById('lead-form');f.reset();state.editing=c?.id||null;document.getElementById('modal-title').textContent=c?'Lead Düzenle':'Hızlı Lead';renderAdvisorOptions(c?.advisor||ADVISORS[0]);f.id.value=c?.id||'';f.name.value=c?.name||'';f.phone.value=c?.phone||'';f.sku.value=c?.sku||'';f.advisor.value=normalizeAdvisorName(c?.advisor||ADVISORS[0]);f.status.value=c?.status||'new';f.appointmentDate.value=c?.appointmentDate||'';f.priority.value=(c?.priority==='vip'?'vip':'normal');f.note.value=c?.note||'';f.reminderPreset.value='today';document.getElementById('lead-modal').classList.add('open');}
+function closeForm(){document.getElementById('lead-modal').classList.remove('open');state.editing=null}
+function reminderFromPreset(v){if(v==='tomorrow')return addDays(1);if(v==='3')return addDays(3);if(v==='7')return addDays(7);return today()}
+function submitForm(e){e.preventDefault();const f=e.currentTarget;const pickedAppointment=f.appointmentDate.value||'';const data={name:f.name.value.trim(),phone:f.phone.value.trim(),sku:f.sku.value.trim(),advisor:normalizeAdvisorName(f.advisor.value||ADVISORS[0]),status:f.status.value,appointmentDate:f.status.value==='appointment'?(pickedAppointment||today()):pickedAppointment,priority:(f.priority.value==='vip'?'vip':'normal'),note:f.note.value.trim(),reminder:f.status.value==='appointment'?(pickedAppointment||today()):reminderFromPreset(f.reminderPreset.value)};if(!data.name||!data.phone)return toast('Ad ve telefon zorunlu.');if(state.editing){state.customers=state.customers.map(c=>c.id===state.editing?{...c,...data,history:[...(c.history||[]),'Lead güncellendi']}:c);toast('Lead güncellendi.');}else{state.customers.unshift({id:String(Date.now()),status:'new',visitDate:today(),tags:tagify(data.note+' '+data.sku),history:['Lead oluşturuldu'],outreachTotal:0,outreachToday:0,outreachDate:today(),...data});toast('Lead eklendi.');}save();closeForm();render();}
+function tagify(t){t=(t||'').toLocaleLowerCase('tr');let tags=[];if(t.includes('vip'))tags.push('vip');if(t.includes('hediye')||t.includes('gift'))tags.push('hediye');if(t.includes('alyans')||t.includes('wedding'))tags.push('alyans');if(t.includes('ring')||t.includes('yüzük'))tags.push('ring');return tags}
+
+function todoCustomerById(id){return state.customers.find(c=>String(c.id)===String(id))}
+function todoTagInfo(dueDate){
+  if(!dueDate)return['normal','Tarihsiz'];
+  if(dueDate===today())return['today','Bugün'];
+  const d=diff(dueDate);
+  if(d>0)return['overdue',`Geciken • ${fmt(dueDate)}`];
+  if(d===-1)return['today','Yarın'];
+  if(d>=-7)return['upcoming',fmt(dueDate)];
+  return['upcoming',fmt(dueDate)];
+}
+function openTodoForm(editId){
+  const f=document.getElementById('todo-form');
+  if(!f)return;
+  f.reset();
+  const sel=f.customerId;
+  const list=[...state.customers].sort((a,b)=>(a.name||'').localeCompare(b.name||'','tr'));
+  sel.innerHTML=`<option value="">— Müşteri seç —</option>`+list.map(c=>`<option value="${c.id}">${c.name||'(isimsiz)'} • ${c.advisor||'CA yok'}</option>`).join('');
+  state.todoEditing=null;
+  const titleEl=document.getElementById('todo-modal-title');
+  if(editId){
+    const t=state.todos.find(x=>x.id===editId);
+    if(t){
+      state.todoEditing=editId;
+      sel.value=t.customerId||'';
+      f.text.value=t.text||'';
+      f.dueDate.value=t.dueDate||today();
+      if(titleEl)titleEl.textContent='To-Do Düzenle';
+      document.getElementById('todo-modal').classList.add('open');
+      setTimeout(()=>{try{f.text.focus()}catch(e){}},80);
+      return;
+    }
+  }
+  f.dueDate.value=today();
+  if(titleEl)titleEl.textContent='Yeni To-Do';
+  document.getElementById('todo-modal').classList.add('open');
+  setTimeout(()=>{try{sel.focus()}catch(e){}},50);
+}
+function closeTodoForm(){
+  document.getElementById('todo-modal').classList.remove('open');
+  state.todoEditing=null;
+  const titleEl=document.getElementById('todo-modal-title');
+  if(titleEl)titleEl.textContent='Yeni To-Do';
+}
+function submitTodoForm(e){
+  e.preventDefault();
+  const f=e.currentTarget;
+  const customerId=f.customerId.value;
+  const dueDate=f.dueDate.value||today();
+  const text=(f.text.value||'').trim();
+  if(!customerId){toast('Müşteri seç.');return}
+  if(!text){toast('Not yaz.');return}
+  const c=todoCustomerById(customerId);
+  if(state.todoEditing){
+    const id=state.todoEditing;
+    state.todos=state.todos.map(t=>t.id===id?{...t,customerId,customerName:c?.name||t.customerName||'(silinmiş müşteri)',advisor:c?.advisor??t.advisor??'',text,dueDate}:t);
+    save();
+    closeTodoForm();
+    render();
+    toast('To-do güncellendi.');
+    return;
+  }
+  state.todos.unshift({id:String(Date.now())+Math.floor(Math.random()*1e4),customerId,customerName:c?.name||'(silinmiş müşteri)',advisor:c?.advisor||'',text,dueDate,done:false,createdAt:today()});
+  save();
+  closeTodoForm();
+  render();
+  toast('To-do eklendi.');
+}
+function toggleTodo(id){
+  state.todos=state.todos.map(t=>t.id===id?{...t,done:!t.done,completedAt:!t.done?today():''}:t);
+  save();
+  render();
+}
+function deleteTodo(id){
+  const t=state.todos.find(x=>x.id===id);
+  if(!t)return;
+  if(!confirm(`"${t.customerName}" için bu to-do silinsin mi?`))return;
+  state.todos=state.todos.filter(t=>t.id!==id);
+  save();
+  render();
+  toast('To-do silindi.');
+}
+function todoCard(t){
+  const [cls,label]=todoTagInfo(t.dueDate);
+  const advisorTag=t.advisor?`<span class="todo-tag">CA: ${t.advisor}</span>`:'';
+  const overdueNote=cls==='overdue'?`<span class="todo-tag overdue">⚠ Gecikti</span>`:'';
+  return `<div class="todo-item ${t.done?'done':''}"><div class="todo-check ${t.done?'checked':''}" data-todo-toggle="${t.id}">${t.done?'✓':''}</div><div class="todo-content"><div class="todo-customer">${t.customerName}<span class="todo-tag ${cls}">${label}</span>${overdueNote}</div><div class="todo-text">${t.text}</div><div class="todo-meta">${advisorTag}</div></div><div class="todo-actions"><button class="todo-edit" data-todo-edit="${t.id}" title="Düzenle" aria-label="Düzenle">✎</button><button class="todo-del" data-todo-del="${t.id}" title="Sil" aria-label="Sil">×</button></div></div>`;
+}
+function renderAdvisorTodos(){
+  const wrap=document.getElementById('advisor-todo-list');
+  const cnt=document.getElementById('advisor-todo-count');
+  if(!wrap||!cnt)return;
+  const todayTodos=state.todos.filter(t=>!t.done&&t.dueDate===today())
+    .sort((a,b)=>(a.createdAt||'').localeCompare(b.createdAt||''));
+  const overdueTodos=state.todos.filter(t=>!t.done&&t.dueDate&&diff(t.dueDate)>0)
+    .sort((a,b)=>(a.dueDate||'').localeCompare(b.dueDate||''));
+  const all=overdueTodos.concat(todayTodos);
+  cnt.textContent=`${all.length} adet`;
+  wrap.innerHTML=all.length?all.map(todoCard).join(''):`<div class="todo-empty">Bugün için yapılacak yok. Aşağıdaki butondan ekle.</div>`;
+}
+function filteredTodos(){
+  const f=state.todoFilter;
+  const td=(d)=>d&&diff(d)>0;
+  const isToday=(d)=>d===today();
+  const isUpcoming=(d)=>d&&diff(d)<0;
+  let list=[...state.todos];
+  if(f==='pending')list=list.filter(t=>!t.done);
+  else if(f==='today')list=list.filter(t=>!t.done&&isToday(t.dueDate));
+  else if(f==='overdue')list=list.filter(t=>!t.done&&td(t.dueDate));
+  else if(f==='upcoming')list=list.filter(t=>!t.done&&isUpcoming(t.dueDate));
+  else if(f==='done')list=list.filter(t=>t.done);
+  return list.sort((a,b)=>{
+    if(!!a.done!==!!b.done)return a.done?1:-1;
+    const ad=a.dueDate||'';
+    const bd=b.dueDate||'';
+    if(ad!==bd)return ad.localeCompare(bd);
+    return (a.createdAt||'').localeCompare(b.createdAt||'');
+  });
+}
+function renderTodosView(){
+  const filtersEl=document.getElementById('todo-filters');
+  const listEl=document.getElementById('todo-list');
+  const pillEl=document.getElementById('todos-pill');
+  if(!filtersEl||!listEl)return;
+  const filters=[['pending','Açık'],['today','Bugün'],['overdue','Geciken'],['upcoming','Yaklaşan'],['done','Tamamlanan'],['all','Tümü']];
+  filtersEl.innerHTML=filters.map(([id,l])=>`<button class="chip ${state.todoFilter===id?'active':''}" data-todofilter="${id}">${l}</button>`).join('');
+  const list=filteredTodos();
+  if(pillEl){
+    const pending=state.todos.filter(t=>!t.done).length;
+    const done=state.todos.filter(t=>t.done).length;
+    pillEl.textContent=`${pending} açık • ${done} tamamlandı`;
+  }
+  listEl.innerHTML=list.length?list.map(t=>`<div class="card todo-card-wrap">${todoCard(t)}</div>`).join(''):`<div class="card"><div class="hint">Bu filtreye uyan to-do yok.</div></div>`;
+}
+function phoneDigits(p){const d=(p||'').replace(/\D/g,'');return '90'+d.slice(-10)}
+function openAppointmentForm(c){if(!c)return;openForm(c);const f=document.getElementById('lead-form');f.status.value='appointment';f.appointmentDate.value=c.appointmentDate||today();setTimeout(()=>{try{f.appointmentDate.showPicker?f.appointmentDate.showPicker():f.appointmentDate.focus()}catch(e){f.appointmentDate.focus()}},150)}
+async function copyText(text){try{await navigator.clipboard.writeText(text);toast('Kopyalandı.');}catch{const ta=document.createElement('textarea');ta.value=text;ta.style.position='fixed';ta.style.left='-9999px';document.body.appendChild(ta);ta.focus();ta.select();try{document.execCommand('copy');toast('Kopyalandı.');}catch{toast('Kopyalanmadı. Metni manuel seç.');}ta.remove();}}
+
+function renameSelectedCA(){
+ const current=state.ca&&state.ca!=='all'?state.ca:(unique('advisor')[0]||'Safa');
+ const next=(prompt('Yeni CA adı:', current)||'').trim();
+ if(!next)return;
+ const old=current;
+ let count=0;
+ state.customers=state.customers.map(c=>{
+  if((c.advisor||'')===old){count++;return {...c,advisor:next,history:[...(c.history||[]),`CA adı ${old} → ${next} olarak değiştirildi`]}}
+  return c;
+ });
+ if(count===0){toast('Bu CA için müşteri bulunamadı.');return}
+ state.ca=next;
+ save();
+ toast(`${count} müşteride CA adı güncellendi.`);
+ render();
+}
+function bindDynamic(){document.querySelectorAll('[data-filter]').forEach(b=>b.onclick=()=>{state.filter=b.dataset.filter;render()});document.querySelectorAll('[data-wa]').forEach(b=>b.onclick=()=>{const c=state.customers.find(x=>x.id===b.dataset.wa);if(!c)return;recordOutreach(c.id,'WhatsApp');window.open(`https://wa.me/${phoneDigits(c.phone)}`,'_blank');render()});document.querySelectorAll('[data-call]').forEach(b=>b.onclick=()=>{const c=state.customers.find(x=>x.id===b.dataset.call);if(!c)return;recordOutreach(c.id,'Arama');window.open(`tel:${c.phone}`,'_self');render()});document.querySelectorAll('[data-appointment]').forEach(b=>b.onclick=()=>openAppointmentForm(state.customers.find(x=>x.id===b.dataset.appointment)));document.querySelectorAll('[data-done]').forEach(b=>b.onclick=()=>{update(b.dataset.done,{status:'won'},'Satış olarak işaretlendi')});document.querySelectorAll('[data-snooze]').forEach(b=>b.onclick=()=>{const c=state.customers.find(x=>x.id===b.dataset.snooze);update(c.id,{reminder:addDays(3,c.reminder||today()),status:c.status==='won'?'won':'followup'},'Takip 3 gün ertelendi')});document.querySelectorAll('[data-edit]').forEach(b=>b.onclick=()=>openForm(state.customers.find(x=>x.id===b.dataset.edit)));document.querySelectorAll('[data-delete]').forEach(b=>b.onclick=()=>{if(confirm('Silinsin mi?')){state.customers=state.customers.filter(c=>c.id!==b.dataset.delete);save();render()}});document.querySelectorAll('[data-todo-toggle]').forEach(b=>b.onclick=()=>toggleTodo(b.dataset.todoToggle));document.querySelectorAll('[data-todo-del]').forEach(b=>b.onclick=()=>deleteTodo(b.dataset.todoDel));document.querySelectorAll('[data-todo-edit]').forEach(b=>b.onclick=()=>openTodoForm(b.dataset.todoEdit));document.querySelectorAll('[data-todofilter]').forEach(b=>b.onclick=()=>{state.todoFilter=b.dataset.todofilter;render()})}
+function recordOutreach(id,type){state.customers=state.customers.map(c=>{if(c.id!==id)return c;const sameDay=c.outreachDate===today();const todayCount=(sameDay?Number(c.outreachToday||0):0)+1;return {...c,status:c.status==='new'?'contacted':c.status,outreachDate:today(),outreachToday:todayCount,outreachTotal:Number(c.outreachTotal||0)+1,history:[...(c.history||[]),`${type} outreach eklendi`]}});save();toast(`${type} outreach eklendi.`)}
+function update(id,patch,msg){state.customers=state.customers.map(c=>c.id===id?{...c,...patch,history:[...(c.history||[]),msg]}:c);save();toast(msg);render();}
+
+/* ============================================================
+   BOOT
+   ============================================================ */
+load();render();
+normalizeAdvisors();
+
+// Mevcut Drive config'i yükle + bağlantıyı başlat
+(function bootDrive(){
+  if(_driveEnabled()){
+    setTimeout(()=>{
+      drivePull(true);
+      _driveInterval=setInterval(()=>drivePull(true),30000);
+      _driveBooted=true;
+    },500);
+  }
+})();
+
+// AI Modal bağlantıları
+document.getElementById('ai-fab').onclick=openAIModal;
+document.getElementById('close-ai').onclick=closeAIModal;
+document.querySelectorAll('.ai-tab').forEach(b=>b.onclick=()=>setAITab(b.dataset.aitab));
+document.getElementById('ai-send').onclick=()=>{const inp=document.getElementById('ai-input');aiSend(inp.value);inp.value='';inp.style.height='auto';};
+document.getElementById('ai-input').addEventListener('keydown',e=>{
+  if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();document.getElementById('ai-send').click();}
+});
+document.getElementById('ai-input').addEventListener('input',e=>{
+  e.target.style.height='auto';
+  e.target.style.height=Math.min(e.target.scrollHeight,120)+'px';
+});
+document.querySelectorAll('.ai-suggest').forEach(b=>b.onclick=()=>{aiSend(b.dataset.suggest);});
+document.getElementById('ai-voice-btn').onclick=_voiceToggleLive;
+document.getElementById('voice-minmax-id').onchange=e=>localStorage.setItem('tiff_voice_id',e.target.value);
+document.getElementById('voice-speed').oninput=e=>{document.getElementById('voice-speed-val').textContent=e.target.value;localStorage.setItem('tiff_voice_speed',e.target.value);};
+// Voice ayarlarını geri yükle
+(function loadVoiceSettings(){
+  const v=localStorage.getItem('tiff_voice_id');
+  const s=localStorage.getItem('tiff_voice_speed');
+  if(v){const sel=document.getElementById('voice-minmax-id');if(sel){sel.value=v;sel.dispatchEvent(new Event('change'));}}
+  if(s){const r=document.getElementById('voice-speed');if(r){r.value=s;document.getElementById('voice-speed-val').textContent=s;}}
+})();
+
+// Drive modal
+document.getElementById('open-drive').onclick=()=>{
+  document.getElementById('drive-url').value=localStorage.getItem(DRIVE_KEY_PREFIX+"_url")||'';
+  document.getElementById('drive-token').value=localStorage.getItem(DRIVE_KEY_PREFIX+"_token")||'';
+  document.getElementById('drive-modal').classList.add('open');
+};
+document.getElementById('drive-cancel').onclick=()=>document.getElementById('drive-modal').classList.remove('open');
+document.getElementById('drive-test').onclick=async()=>{
+  const url=document.getElementById('drive-url').value.trim();
+  const token=document.getElementById('drive-token').value.trim();
+  if(!url||!token){toast('URL ve token gerekli.');return}
+  if(driveSaveConfig(url,token)){
+    toast('Drive kaydedildi, senkron başlıyor...');
+    setTimeout(()=>{
+      if(syncStatus==='ok')toast('Drive bağlantısı başarılı ✓');
+      else if(syncStatus==='unauth')toast('Token hatalı, kontrol et');
+      else if(syncStatus==='error')toast('Apps Script ulaşılamadı, URL kontrol et');
+    },2000);
+  }
+};
+
+// AI Key modal
+function _aikeyRefreshStatus(){
+  const el=document.getElementById('aikey-status');
+  if(!el)return;
+  el.innerHTML=AI_CONFIG.apiKey?'<b>✓ Key ayarlı.</b>':'<b>⚠ Key ayarlı değil.</b> AI özellikleri çalışmaz.';
+}
+document.getElementById('open-aikey').onclick=()=>{
+  document.getElementById('aikey-input').value='';
+  _aikeyRefreshStatus();
+  document.getElementById('aikey-modal').classList.add('open');
+};
+document.getElementById('aikey-cancel').onclick=()=>document.getElementById('aikey-modal').classList.remove('open');
+document.getElementById('aikey-save').onclick=()=>{
+  const v=document.getElementById('aikey-input').value.trim();
+  if(!v){toast('Key boş olamaz.');return}
+  try{localStorage.setItem('pk_ai_key',v)}catch(e){}
+  AI_CONFIG.apiKey=v;
+  toast('API key kaydedildi ✓');
+  document.getElementById('aikey-modal').classList.remove('open');
+};
+
+document.getElementById('advisor-tab').onclick=()=>{state.mode='advisor';render()};
+document.getElementById('manager-tab').onclick=()=>{state.mode='manager';render()};
+document.getElementById('todos-tab').onclick=()=>{state.mode='todos';render()};
+document.getElementById('quick-add').onclick=()=>openForm();
+document.getElementById('ca-excel-report').onclick=shareCaExcelReport;
+document.getElementById('float-add').onclick=()=>openForm();
+document.getElementById('close-modal').onclick=closeForm;
+document.getElementById('cancel-form').onclick=closeForm;
+document.getElementById('lead-form').onsubmit=submitForm;
+document.querySelector('[name="status"]').onchange=e=>{const f=document.getElementById('lead-form');if(e.target.value==='appointment'&&!f.appointmentDate.value)f.appointmentDate.value=today()};
+document.getElementById('show-today').onclick=()=>{state.filter='today';render()};
+const openTodoBtn2=document.getElementById('open-todo-form-2');
+if(openTodoBtn2)openTodoBtn2.onclick=()=>openTodoForm();
+
+const searchInput=document.getElementById('search');
+function handleSearch(e){state.search=(e.target.value||'').trimStart();render()}
+searchInput.addEventListener('input',handleSearch);
+searchInput.addEventListener('keyup',handleSearch);
+searchInput.addEventListener('change',handleSearch);
+document.getElementById('ca-filter').onchange=e=>{state.ca=e.target.value;render()};
+document.getElementById('rename-ca').onclick=renameSelectedCA;
+document.getElementById('tag-filter').onchange=e=>{state.tag=e.target.value;render()};
+document.getElementById('copy-report').onclick=()=>copyText(reportText());
+document.getElementById('excel-report').onclick=shareExcelReport;
+document.getElementById('open-todo-form').onclick=openTodoForm;
+document.getElementById('close-todo-modal').onclick=closeTodoForm;
+document.getElementById('cancel-todo-form').onclick=closeTodoForm;
+document.getElementById('todo-form').onsubmit=submitTodoForm;
+</script>
+</body>
+</html>
