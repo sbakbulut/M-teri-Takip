@@ -1,0 +1,15 @@
+# Yerel / gecici dosyalar
+*.tmp
+*.bak
+*~
+.DS_Store
+Thumbs.db
+
+# Arac ciktilari
+node_modules/
+package-lock.json
+/tmp-*
+
+# Yedek dosyalari
+musteri-takip-*.json
+musteri-takip-*.csv
