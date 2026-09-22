@@ -18,7 +18,7 @@ Tiffany & Co. potansiyel müşteri (lead) takip uygulaması. **Tek dosya** (`ind
 
 ### Kurulum (bir kez)
 
-1. Apps Script'te **yeni proje** aç → Para Takip deposundaki `gas/Code.gs` içeriğini yapıştır (iki uygulama aynı script kodunu kullanır, ama **ayrı projeler** olmalıdır).
+1. Apps Script'te **yeni proje** aç → bu depodaki **`gas/Code.gs`** içeriğini yapıştır (iki uygulama aynı script kodunu kullanır, ama **ayrı projeler** olmalıdır — ayrıntı: [`gas/KURULUM.md`](gas/KURULUM.md)).
 2. **Proje Ayarları → Komut Dosyası Özellikleri → Özellik ekle** → ad: `token`, değer: **en az 16 karakter** gizli kelime.
 3. **Dağıt → Yeni dağıtım → Web uygulaması** · *Şu kullanıcı olarak çalıştır:* **Ben** · *Erişimi olanlar:* **Herkes** → `/exec` URL'ini kopyala.
 4. Uygulamada **Yönetici → Drive Ayarları** → URL + aynı gizli kelime → **Test Et & Kaydet** → `✓ Güvenli protokol çalışıyor` + `✓ URL'de token yolu kapalı`.
@@ -39,6 +39,16 @@ Tiffany & Co. potansiyel müşteri (lead) takip uygulaması. **Tek dosya** (`ind
 - Veriler tarayıcıda `localStorage`'da tutulur (`tiffany-clean-ui-v2`, `…-todos`); Drive senkron yedek ve çoklu cihaz içindir.
 - Drive ayarları `tiffany_drive_url` / `tiffany_drive_token`; anlık görüntü `tiffany_drive_snapshot` anahtarındadır.
 - Token **hiçbir zaman URL'de taşınmaz** (ne istemcide ne sunucuda kabul edilir).
+
+## Depo yapısı
+
+| Dosya | Açıklama |
+|---|---|
+| `index.html` | Uygulamanın tamamı (tek dosya) |
+| `gas/Code.gs` | Apps Script sunucusu (Drive senkron, güvenli protokol rev 3) |
+| `gas/KURULUM.md` | Adım adım kurulum + 4 curl doğrulama testi |
+| `publish.sh` | Doğrula (JS sözdizimi + token URL kontrolü) → commit → push |
+| `README.md` | Bu dosya (sürüm notları) |
 
 ## Geliştirme / yayın
 
