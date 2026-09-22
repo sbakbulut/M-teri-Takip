@@ -399,6 +399,16 @@ let _driveInterval=null;
 let _driveBooted=false;
 let _driveSuppressPush=false;   /* uzak veri uygulanırken geri push'u engeller */
 let _drivePending=null;         /* çakışma bekleyen uzak veri */
+let _driveVerified=false;       /* uzak içerik bir kez doğrulandı mı */
+let _driveForeign=false;        /* uzak veri BAŞKA bir uygulamaya ait (ör. Para Takip) */
+
+/* Uzak veri başka bir uygulamanın şemasına mı benziyor? (veri karışmasını önler) */
+function looksForeign(raw){
+  if(!raw||typeof raw!=="object"||Array.isArray(raw))return false;
+  const keys=Object.keys(raw);
+  return ["expenses","incomes","incomeEntries","debts","budgets","recurring","savings","budgetProfiles"]
+    .some(function(k){return keys.indexOf(k)>=0});
+}
 
 /* ---------------- Güvenli Drive protokolü (Para Takip v11.1 ile aynı) ----------------
    Kurallar:
@@ -586,6 +596,7 @@ async function drivePull(silent){
       setSyncStatus("error");if(!silent)toast("Drive hatası: "+json.error);return false;
     }
     if(typeof json.data!=="string"||!json.data){
+      _driveVerified=true;_driveForeign=false;
       setSyncStatus("ok");setLastSyncTs(Date.now());
       if(!silent)toast("Drive'da kayıt yok — yerel veri gönderilebilir.");
       return false;
@@ -598,17 +609,24 @@ async function drivePull(silent){
     }
     const clean=sanitizeRemote(raw);
     if(!clean.data){
+      _driveVerified=true;_driveForeign=looksForeign(raw);
       setSyncStatus("error");
-      _driveNotice("Drive'daki veri biçimi geçersiz — yerel verin korundu.",[{label:"Tamam",fn:_driveNoticeHide}]);
+      _driveNotice(
+        _driveForeign
+          ? "⚠ Bu URL başka bir uygulamaya ait görünüyor (ör. Para Takip). Veri karışmasını önlemek için bu uygulama buraya YAZMADI. Yönetici → Drive Ayarları'ndan bu uygulamanın kendi Apps Script URL'ini gir."
+          : "Drive'daki veri biçimi geçersiz — yerel verin korundu, yazma yapılmadı.",
+        [{label:"Tamam",fn:_driveNoticeHide}]
+      );
       return false;
     }
     if(clean.dropped)console.warn("[drivePull] "+clean.dropped+" geçersiz kayıt atlandı.");
     const why=remoteSuspicious(clean.data,{customers:state.customers});
-    if(why){
+    if(why==="tiny_remote"){
       _drivePending=clean.data;
+      _driveVerified=true;
       setSyncStatus("error");
-      _driveNotice(
-        "Uzaktaki veri boş/çok küçük görünüyor ("+why+"). Yerel verin korundu — ne yapmak istersin?",
+      if(!silent)_driveNotice(
+        "Uzaktaki veri yerelden çok küçük görünüyor ("+clean.data.customers.length+" kayıt / yerelde "+state.customers.length+"). Yerel verin korundu — ne yapmak istersin?",
         [
           {label:"Uzağı uygula",fn:driveApplyPending},
           {label:"Yereli gönder",fn:function(){_drivePending=null;drivePush()},primary:true},
@@ -617,6 +635,14 @@ async function drivePull(silent){
       );
       return false;
     }
+    if(why==="empty_remote"){
+      /* Uzak boş — kaybedilecek uzak veri yok, yereli göndermek güvenli */
+      _driveVerified=true;_driveForeign=false;
+      setSyncStatus("ok");
+      if(!silent)toast("Drive boş — yerel veri gönderiliyor.");
+      return false;
+    }
+    _driveVerified=true;_driveForeign=false;
     driveSnapshotSave("uzak");
     _driveSuppressPush=true;
     state.customers=clean.data.customers;
@@ -654,6 +680,7 @@ async function driveApplyPending(){
 
 async function drivePush(){
   if(!_driveEnabled())return false;
+  if(_driveForeign){setSyncStatus("error");toast("Yanlış Drive URL'i (başka uygulamanın sunucusu) — yazma yapılmadı.");return false}
   setSyncStatus("syncing");
   try{
     const data=JSON.stringify({customers:state.customers,todos:state.todos});
@@ -680,19 +707,33 @@ function drivePushDebounced(){
   if(!_driveEnabled())return;
   if(_driveSuppressPush)return;   /* uzak veri uygulanırken geri push yapma */
   if(_drivePushTimer)clearTimeout(_drivePushTimer);
-  _drivePushTimer=setTimeout(drivePush,1500);
+  _drivePushTimer=setTimeout(async function(){
+    if(_drivePending)return;   /* çakışma kararı beklenirken otomatik yazma yapma */
+    /* İlk yazmadan önce uzak içeriği bir kez doğrula (yanlış URL'e yazmayı önler) */
+    if(!_driveVerified){try{await drivePull(true)}catch(e){}}
+    if(_driveForeign){setSyncStatus("error");toast("Yanlış Drive URL'i — bu uygulamaya yazma yapılmadı.");return}
+    if(_drivePending)return;
+    drivePush();
+  },1500);
 }
 
 function driveSaveConfig(url,token){
   try{
     localStorage.setItem(DRIVE_KEY_PREFIX+"_url",(url||"").trim());
     localStorage.setItem(DRIVE_KEY_PREFIX+"_token",(token||"").trim());
+    _driveVerified=false;_driveForeign=false;
     setSyncStatus("syncing");
     setTimeout(async()=>{
       const p=await drivePing();
       if(p.fatal){setSyncStatus(p.ok?"ok":"error");return}
       if((token||"").trim().length<16){
         _driveNotice("Token 16 karakterden kısa — yeni script en az 16 zorunlu kılıyor. Daha uzun bir gizli kelime kullan.",[{label:"Anladım",fn:_driveNoticeHide}]);
+      }
+      await drivePull(true);   /* uzak içeriği doğrula — yanlış URL'e yazmayı önler */
+      if(_driveForeign){
+        setSyncStatus("error");
+        _driveNotice("⚠ Bu URL başka bir uygulamaya ait (ör. Para Takip). Veri karışmasını önlemek için yazma yapılmadı — bu uygulamanın kendi Apps Script URL'ini gir.",[{label:"Anladım",fn:_driveNoticeHide}]);
+        return;
       }
       await drivePush();   /* kurulumda yerel veri sunucuya yazılır (yerelden uzağa) */
       if(!_driveBooted){
