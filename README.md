@@ -3,7 +3,15 @@
 Tiffany & Co. potansiyel müşteri (lead) takip uygulaması. **Tek dosya** (`index.html`), kurulum gerekmez, veriler tarayıcıda (`localStorage`) durur.
 
 - **Canlı:** https://sbakbulut.github.io/M-teri-Takip/
-- **Sürüm:** `v2.1`
+- **Sürüm:** `v2.2`
+
+## v2.2 — Yönetici paneli kaldırıldı, yerine Ayarlar
+
+| # | Değişiklik | Ayrıntı |
+|---|---|---|
+| 1 | **Yönetici sekmesi kaldırıldı** | Üçüncü sekme artık **Ayarlar** ve yalnızca iki ayar girişi içerir: **☁️ Drive Ayarları** ve **🔑 AI Key Ayarları**. |
+| 2 | **Yönetici paneli içeriği kaldırıldı** | Mağaza KPI'ları, günlük rapor metni, CA performans/outreach çubukları, bugünkü appointment ve acil listeleri ile **Excel Rapor Paylaş** / **Metin Raporu Kopyala** düğmeleri kaldırıldı; ilgili kod da temizlendi (`renderBars`, `renderOutreachBars`, `reportText`, `excelRows`/`excelHtml`/`shareExcelReport`). |
+| 3 | **Raporlama korundu** | Müşteri bazlı rapor **Client Advisor → CA Günlük Excel Rapor** düğmesindedir; veri modeli, Drive senkron protokolü ve AI özellikleri değişmedi. |
 
 ## v2.1 — Drive senkron düzeltmesi + DeepSeek AI
 
@@ -21,8 +29,8 @@ Tiffany & Co. potansiyel müşteri (lead) takip uygulaması. **Tek dosya** (`ind
 1. Apps Script'te **yeni proje** aç → bu depodaki **`gas/Code.gs`** içeriğini yapıştır (iki uygulama aynı script kodunu kullanır, ama **ayrı projeler** olmalıdır — ayrıntı: [`gas/KURULUM.md`](gas/KURULUM.md)).
 2. **Proje Ayarları → Komut Dosyası Özellikleri → Özellik ekle** → ad: `token`, değer: **en az 16 karakter** gizli kelime.
 3. **Dağıt → Yeni dağıtım → Web uygulaması** · *Şu kullanıcı olarak çalıştır:* **Ben** · *Erişimi olanlar:* **Herkes** → `/exec` URL'ini kopyala.
-4. Uygulamada **Yönetici → Drive Ayarları** → URL + aynı gizli kelime → **Test Et & Kaydet** → `✓ Güvenli protokol çalışıyor` + `✓ URL'de token yolu kapalı`.
-5. **🔑 DeepSeek API Key** → `sk-…` anahtarını gir.
+4. Uygulamada **Ayarlar → ☁️ Drive Ayarları** → URL + aynı gizli kelime → **Test Et & Kaydet** → `✓ Güvenli protokol çalışıyor` + `✓ URL'de token yolu kapalı`.
+5. **Ayarlar → 🔑 AI Key Ayarları** → `sk-…` anahtarını gir.
 
 ### Doğrulama (yayındaki uçta)
 
