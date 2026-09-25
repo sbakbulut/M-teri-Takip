@@ -3,7 +3,36 @@
 Tiffany & Co. potansiyel müşteri (lead) takip uygulaması. **Tek dosya** (`index.html`), kurulum gerekmez, veriler tarayıcıda (`localStorage`) durur.
 
 - **Canlı:** https://sbakbulut.github.io/M-teri-Takip/
-- **Sürüm:** `v2.2`
+- **Sürüm:** `v2.3`
+
+## v2.3 — Sesli sohbet kaldırıldı
+
+| # | Değişiklik | Ayrıntı |
+|---|---|---|
+| 1 | **🎙️ Sesli Sohbet sekmesi kaldırıldı** | **✦ AI Danışman** panelindeki sohbet/sesli sohbet sekme çubuğu kaldırıldı; panel artık doğrudan **yazışarak sor** modunu açar (sohbet kutusu, hızlı sorular, **Gönder** aynen duruyor). |
+| 2 | **Mikrofon (STT) ve TTS kaldırıldı** | `SpeechRecognition` / `webkitSpeechRecognition` (mikrofon girişi), `speechSynthesis` + `SpeechSynthesisUtterance` (sesli okuma), **Canlı (Live) modu**, ses seçici ve hız ayarı, `_voice*` fonksiyonları, `voice-live` fab animasyonu ve ilgili CSS kuralları silindi. |
+| 3 | **localStorage temizliği** | Artık `tiff_voice_id` ve `tiff_voice_speed` anahtarları yazılmaz; tarayıcıda kalan eski değerler kullanılmaz (uygulama okumaz, işlevsiz kalır). |
+| 4 | **Diğer AI fonksiyonlarına dokunulmadı** | `callAI()` (DeepSeek V4.1 Flash), **✦** butonuyla açılan AI danışman sohbeti, hızlı sorular, `buildFullSnapshot()` bağlamı, **🔑 AI Key** ayarı ve Drive senkron protokolü aynen çalışır. |
+
+### Doğrulama (v2.3, jsdom ile uçtan uca)
+
+```
+$ NODE_PATH=… jsdom node /tmp/mteri-smoke.js
+PASS | kaynak: 'Sesli Sohbet' metni yok
+PASS | kaynak: speechSynthesis/SpeechRecognition yok
+PASS | kaynak: tiff_voice_* anahtari yok
+PASS | kaynak: .ai-tab / setAITab kalmadi
+PASS | DOM: #ai-voice-tab yok / #ai-voice-btn yok / .ai-tab yok
+PASS | DOM: #ai-chat-tab duruyor ve gorunur
+PASS | DOM: AI sohbet kutusu + gonder butonu + 4 hizli soru duruyor
+PASS | JS: callAI / buildFullSnapshot / aiSend tanimli
+PASS | AI paneli aciliyor (✦) ve kapaniyor (Kapat)
+PASS | konsol hatasi yok
+
+ALL PASS  17/17
+```
+
+`publish.sh` kontrolleri de geçti: `<title>` sürüm etiketi + inline JS `node --check` + token URL'ye eklenmiyor.
 
 ## v2.2 — Yönetici paneli kaldırıldı, yerine Ayarlar
 

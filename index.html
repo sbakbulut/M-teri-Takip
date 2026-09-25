@@ -6,7 +6,7 @@
   <meta name="theme-color" content="#81d8d0" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
   <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
-  <title>Tiffany Lead Tracker v2.2 - DeepSeek AI + Drive Sync</title>
+  <title>Tiffany Lead Tracker v2.3 - DeepSeek AI + Drive Sync</title>
   <style>
     :root{
       --tiffany:#81d8d0; --tiffany-dark:#4ab7ad; --ink:#111; --muted:#747b86;
@@ -54,7 +54,6 @@
     /* AI floating butonu (sağ alt) */
     .ai-fab{position:fixed;right:18px;bottom:96px;width:58px;height:58px;border-radius:50%;border:0;background:linear-gradient(135deg,#7c3aed,#a855f7);color:#fff;font-size:26px;box-shadow:0 12px 28px rgba(124,58,237,.45);z-index:30;cursor:pointer;display:flex;align-items:center;justify-content:center;transition:transform .15s}
     .ai-fab:active{transform:scale(.96)}
-    .ai-fab.voice-live{background:linear-gradient(135deg,#ec4899,#ef4444);animation:pulse 1.4s infinite}
 
     /* AI Modal */
     .ai-modal{position:fixed;inset:0;background:rgba(0,0,0,.5);display:none;align-items:flex-end;z-index:50}
@@ -62,9 +61,6 @@
     .ai-sheet{background:#fff;border-radius:28px 28px 0 0;width:100%;max-width:860px;margin:0 auto;padding:18px;max-height:92vh;display:flex;flex-direction:column;overflow:hidden}
     .ai-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:12px}
     .ai-head h3{margin:0;font-size:18px;display:flex;align-items:center;gap:8px}
-    .ai-tabs{display:flex;gap:6px;margin-bottom:10px}
-    .ai-tab{flex:1;padding:10px;border:1px solid var(--line);background:#fff;border-radius:14px;font-weight:800;font-size:13px;cursor:pointer}
-    .ai-tab.active{background:#111;color:#fff;border-color:#111}
     .ai-msgs{flex:1;overflow-y:auto;background:#f8fafc;border:1px solid var(--line);border-radius:18px;padding:12px;display:flex;flex-direction:column;gap:10px;min-height:240px;max-height:50vh}
     .ai-msg{max-width:88%;padding:10px 14px;border-radius:16px;font-size:14px;line-height:1.5;white-space:pre-wrap;word-break:break-word}
     .ai-msg.user{background:#111;color:#fff;align-self:flex-end;border-bottom-right-radius:6px}
@@ -83,15 +79,6 @@
     .ai-tools{display:flex;gap:8px;margin-top:8px;flex-wrap:wrap}
     .ai-tool-btn{border:1px solid var(--line);background:#fff;border-radius:999px;padding:8px 12px;font-size:12px;font-weight:800;cursor:pointer}
     .ai-tool-btn:active{background:#f1f5f9}
-    .ai-voice-btn{border:0;border-radius:50%;width:44px;height:44px;background:linear-gradient(135deg,#ec4899,#ef4444);color:#fff;font-size:18px;cursor:pointer;flex-shrink:0;display:flex;align-items:center;justify-content:center}
-    .ai-voice-btn.listening{animation:pulse 1s infinite}
-    .ai-voice-btn.speaking{background:linear-gradient(135deg,#3b82f6,#6366f1)}
-    .ai-voice-row{display:flex;gap:8px;margin-top:10px;align-items:center}
-    .ai-voice-status{flex:1;font-size:12px;color:var(--muted);font-weight:700}
-    .ai-voice-controls{display:flex;gap:6px;flex-wrap:wrap;margin-top:8px;padding:10px;background:#f8fafc;border-radius:14px;border:1px solid var(--line)}
-    .ai-voice-controls label{font-size:11px;color:var(--muted);font-weight:800;display:block;margin-bottom:4px}
-    .ai-voice-controls select,.ai-voice-controls input[type=range]{width:100%;border:1px solid var(--line);border-radius:10px;padding:6px 8px;background:#fff;font-size:12px}
-    .ai-voice-col{flex:1;min-width:140px}
     .ai-empty{padding:24px;text-align:center;color:var(--muted);font-size:13px}
     .ai-empty b{display:block;color:var(--ink);font-size:14px;margin-bottom:6px}
     .ai-suggest{padding:10px 12px;background:#fff;border:1px solid var(--line);border-radius:14px;font-size:13px;cursor:pointer;text-align:left;width:100%}
@@ -188,11 +175,6 @@
         <h3>✦ AI Danışman</h3>
         <button class="chip" id="close-ai">Kapat</button>
       </div>
-      <div class="ai-tabs">
-        <button class="ai-tab active" data-aitab="chat">💬 Yazışarak Sor</button>
-        <button class="ai-tab" data-aitab="voice">🎙️ Sesli Sohbet</button>
-      </div>
-
       <!-- Chat tab -->
       <div id="ai-chat-tab" style="display:flex;flex-direction:column;flex:1;min-height:0">
         <div class="ai-msgs" id="ai-msgs">
@@ -210,32 +192,6 @@
         <div class="ai-input-row">
           <textarea class="ai-input" id="ai-input" placeholder="Lead'lerin hakkında bir şey sor..." rows="1"></textarea>
           <button class="ai-send" id="ai-send">Gönder</button>
-        </div>
-      </div>
-
-      <!-- Voice tab -->
-      <div id="ai-voice-tab" style="display:none;flex-direction:column;flex:1">
-        <div class="ai-msgs" id="ai-voice-msgs">
-          <div class="ai-empty">
-            <b>Sesli sohbet modu</b>
-            Mikrofon butonuna bas, Türkçe konuş — AI cevap verecek ve sesli okuyacak.
-          </div>
-        </div>
-        <div class="ai-voice-row">
-          <button class="ai-voice-btn" id="ai-voice-btn" title="Konuşmaya başla">🎙️</button>
-          <div class="ai-voice-status" id="ai-voice-status">Hazır — konuşmak için mikrofona dokun</div>
-        </div>
-        <div class="ai-voice-controls">
-          <div class="ai-voice-col">
-            <label>Cihaz Sesi (TTS)</label>
-            <select id="voice-minmax-id" title="Tarayıcıdaki sesler — Türkçe varsa otomatik seçilir">
-              <option value="">Sesler yükleniyor…</option>
-            </select>
-          </div>
-          <div class="ai-voice-col">
-            <label>Hız: <span id="voice-speed-val">1.0</span>x</label>
-            <input type="range" id="voice-speed" min="0.5" max="1.5" step="0.1" value="1.0" />
-          </div>
         </div>
       </div>
     </div>
@@ -271,7 +227,7 @@
   <div class="drive-modal" id="aikey-modal">
     <div class="drive-card">
       <h3>🔑 DeepSeek API Key</h3>
-      <p>AI özelliklerinin (analiz, sesli sohbet) çalışması için gerekli. Key sadece bu cihazda saklanır, koda gömülmez. Para Takip ile aynı anahtar kullanılır (<code>platform.deepseek.com</code> → API Keys).</p>
+      <p>AI özelliklerinin (analiz, sohbet) çalışması için gerekli. Key sadece bu cihazda saklanır, koda gömülmez. Para Takip ile aynı anahtar kullanılır (<code>platform.deepseek.com</code> → API Keys).</p>
       <div class="drive-row">
         <label>API Key</label>
         <input id="aikey-input" type="password" placeholder="sk-... (DeepSeek API anahtarı)" />
@@ -295,7 +251,6 @@
 /* ============================================================
    DeepSeek V4.1 Flash AI ENTEGRASYONU (Para Takip ile ayni)
    API: https://api.deepseek.com (OpenAI uyumlu)
-   Sesli okuma: tarayici speechSynthesis (MiniMax TTS kaldirildi)
    ============================================================ */
 const AI_THINK_KEY="pk_ai_think";
 const AI_CONFIG={
@@ -811,177 +766,6 @@ function _driveNotice(text,actions){
 function _driveNoticeHide(){const el=document.getElementById('drive-notice');if(el)el.classList.remove('open')}
 
 /* ============================================================
-   Voice Chat (sesli sohbet + TTS)
-   ============================================================ */
-/* Tarayici sesleri (speechSynthesis) — MiniMax TTS kaldirildi */
-function _voiceList(){try{return window.speechSynthesis?window.speechSynthesis.getVoices():[]}catch(e){return[]}}
-function voiceSpeed(){return parseFloat((document.getElementById('voice-speed')||{}).value||localStorage.getItem('tiff_voice_speed')||'1.0')}
-function _voicePopulateSelect(){
-  const sel=document.getElementById('voice-minmax-id');
-  if(!sel)return;
-  const list=_voiceList();
-  if(!list.length)return;
-  const saved=localStorage.getItem('tiff_voice_id')||'';
-  sel.innerHTML='';
-  list.slice(0,80).forEach(function(v,i){
-    const o=document.createElement('option');
-    o.value=String(i);
-    o.textContent=v.name+' ('+v.lang+')';
-    sel.appendChild(o);
-  });
-  let idx=list.findIndex(function(v){return saved&&(v.name+'|'+v.lang)===saved});
-  if(idx<0){
-    const tr=list.find(function(v){return /^tr/i.test(v.lang||'')});
-    const en=list.find(function(v){return /^en/i.test(v.lang||'')});
-    idx=list.indexOf(tr>=0?tr:(en>=0?en:list[0]));
-  }
-  sel.value=String(idx<0?0:idx);
-}
-function _voiceSelected(){
-  const sel=document.getElementById('voice-minmax-id');
-  const list=_voiceList();
-  if(!list.length)return null;
-  const i=parseInt(sel&&sel.value,10);
-  return list[isFinite(i)?i:0]||null;
-}
-
-let _voiceRec=null;
-let _voiceBusy=false;
-let _voiceAudioEl=null;
-let _voiceLive=false;
-let _voiceListening=false;
-let _voiceSpeaking=false;
-let _voiceHistory=[];
-
-function _voiceStopSpeak(){
-  try{if(window.speechSynthesis)window.speechSynthesis.cancel()}catch(e){}
-  try{if(_voiceAudioEl){_voiceAudioEl.onended=null;_voiceAudioEl.pause();_voiceAudioEl.currentTime=0}}catch(e){}
-}
-
-async function _voiceSpeak(text){
-  if(!text)return;
-  if(!window.speechSynthesis){toast('Bu tarayıcı sesli okumayı desteklemiyor.');return}
-  try{
-    _voiceStopSpeak();
-    setVoiceSpeaking(true);
-    const u=new SpeechSynthesisUtterance(String(text).slice(0,1500));
-    const v=_voiceSelected();
-    if(v){u.voice=v;u.lang=v.lang||'tr-TR'}else{u.lang='tr-TR'}
-    u.rate=Math.min(2,Math.max(0.5,voiceSpeed()||1));
-    u.onend=()=>{
-      setVoiceSpeaking(false);
-      if(_voiceLive&&!_voiceListening)setTimeout(()=>{if(_voiceLive&&!_voiceListening)_voiceStartRec()},300);
-    };
-    u.onerror=()=>setVoiceSpeaking(false);
-    window.speechSynthesis.speak(u);
-  }catch(e){
-    setVoiceSpeaking(false);
-  }
-}
-
-function _voiceStartRec(){
-  const SR=window.SpeechRecognition||window.webkitSpeechRecognition;
-  if(!SR){setVoiceStatus("Bu tarayıcı sesli girişi desteklemiyor. Chrome/Edge kullan.");return;}
-  if(_voiceRec){try{_voiceRec.abort()}catch(e){}_voiceRec=null;}
-  try{
-    const rec=new SR();
-    _voiceRec=rec;
-    rec.lang="tr-TR";
-    rec.continuous=false;
-    rec.interimResults=false;
-    setVoiceListening(true);
-    setVoiceStatus("🎤 Dinliyorum...");
-    rec.onresult=(ev)=>{
-      const final=ev.results[ev.results.length-1][0].transcript;
-      if(final)_voiceAskAI(final);
-    };
-    rec.onerror=(ev)=>{
-      setVoiceListening(false);
-      if(ev.error==="no-speech")setVoiceStatus("Ses algılanmadı, tekrar dene");
-      else if(ev.error==="not-allowed")setVoiceStatus("Mikrofon izni verilmedi");
-      else setVoiceStatus("Hata: "+ev.error);
-    };
-    rec.onend=()=>{
-      setVoiceListening(false);
-      if(_voiceLive&&!_voiceSpeaking){
-        // kullanıcı sustu, otomatik tekrar başlat (live mode)
-        setTimeout(()=>{if(_voiceLive&&!_voiceListening&&!_voiceSpeaking)_voiceStartRec()},400);
-      }
-    };
-    rec.start();
-  }catch(e){
-    setVoiceStatus("Başlatılamadı: "+String(e));
-    setVoiceListening(false);
-  }
-}
-
-function _voiceStopRec(){
-  if(_voiceRec){try{_voiceRec.abort()}catch(e){}_voiceRec=null;}
-  setVoiceListening(false);
-}
-
-function _voiceToggleLive(){
-  _voiceLive=!_voiceLive;
-  const fab=document.getElementById('ai-fab');
-  const btn=document.getElementById('ai-voice-btn');
-  if(_voiceLive){
-    fab?.classList.add('voice-live');
-    btn?.classList.add('listening');
-    setVoiceStatus("🔴 Canlı — konuşabilirsin");
-    _voiceStartRec();
-  }else{
-    fab?.classList.remove('voice-live');
-    btn?.classList.remove('listening');
-    _voiceStopRec();
-    _voiceStopSpeak();
-    setVoiceStatus("Hazır — konuşmak için mikrofona dokun");
-  }
-}
-
-async function _voiceAskAI(text){
-  if(_voiceBusy||!text)return;
-  _voiceBusy=true;
-  pushVoiceMsg("user",text);
-  const messages=_voiceHistory.concat([{role:"user",content:text}]);
-  const snap=buildFullSnapshot();
-  const sysExtra="\n\n=== BUGÜNÜN TARİHİ: "+today()+" ===\n\n=== VERI (snapshot) ===\n"+JSON.stringify(snap).slice(0,12000);
-  try{
-    const reply=await callAI(messages,sysExtra);
-    _voiceHistory.push({role:"user",content:text},{role:"assistant",content:reply});
-    if(_voiceHistory.length>20)_voiceHistory=_voiceHistory.slice(-20);
-    pushVoiceMsg("bot",reply);
-    await _voiceSpeak(reply);
-  }catch(e){
-    pushVoiceMsg("error","Hata: "+String(e));
-  }finally{
-    _voiceBusy=false;
-  }
-}
-
-function setVoiceListening(v){_voiceListening=v;updateVoiceBtn();}
-function setVoiceSpeaking(v){_voiceSpeaking=v;updateVoiceBtn();}
-function updateVoiceBtn(){
-  const btn=document.getElementById('ai-voice-btn');
-  if(!btn)return;
-  if(_voiceListening){btn.classList.add('listening');btn.classList.remove('speaking');btn.textContent='🎤';}
-  else if(_voiceSpeaking){btn.classList.remove('listening');btn.classList.add('speaking');btn.textContent='🔊';}
-  else{btn.classList.remove('listening');btn.classList.remove('speaking');btn.textContent='🎙️';}
-}
-function setVoiceStatus(s){const el=document.getElementById('ai-voice-status');if(el)el.textContent=s;}
-function pushVoiceMsg(role,text){
-  const box=document.getElementById('ai-voice-msgs');
-  if(!box)return;
-  // Boş durumu temizle
-  const empty=box.querySelector('.ai-empty');
-  if(empty)empty.remove();
-  const div=document.createElement('div');
-  div.className='ai-msg '+(role==='user'?'user':role==='error'?'error':'bot');
-  div.textContent=text;
-  box.appendChild(div);
-  box.scrollTop=box.scrollHeight;
-}
-
-/* ============================================================
    Chat (yazışarak AI)
    ============================================================ */
 let _aiChatHistory=[];
@@ -1034,13 +818,6 @@ function openAIModal(){
 }
 function closeAIModal(){
   document.getElementById('ai-modal').classList.remove('open');
-  if(_voiceLive)_voiceToggleLive();
-}
-function setAITab(name){
-  document.querySelectorAll('.ai-tab').forEach(b=>b.classList.toggle('active',b.dataset.aitab===name));
-  document.getElementById('ai-chat-tab').style.display=name==='chat'?'flex':'none';
-  document.getElementById('ai-voice-tab').style.display=name==='voice'?'flex':'none';
-  if(name!=='voice'&&_voiceLive)_voiceToggleLive();
 }
 
 /* ============================================================
@@ -1342,7 +1119,6 @@ normalizeAdvisors();
 // AI Modal bağlantıları
 document.getElementById('ai-fab').onclick=openAIModal;
 document.getElementById('close-ai').onclick=closeAIModal;
-document.querySelectorAll('.ai-tab').forEach(b=>b.onclick=()=>setAITab(b.dataset.aitab));
 document.getElementById('ai-send').onclick=()=>{const inp=document.getElementById('ai-input');aiSend(inp.value);inp.value='';inp.style.height='auto';};
 document.getElementById('ai-input').addEventListener('keydown',e=>{
   if(e.key==='Enter'&&!e.shiftKey){e.preventDefault();document.getElementById('ai-send').click();}
@@ -1352,20 +1128,6 @@ document.getElementById('ai-input').addEventListener('input',e=>{
   e.target.style.height=Math.min(e.target.scrollHeight,120)+'px';
 });
 document.querySelectorAll('.ai-suggest').forEach(b=>b.onclick=()=>{aiSend(b.dataset.suggest);});
-document.getElementById('ai-voice-btn').onclick=_voiceToggleLive;
-document.getElementById('voice-minmax-id').onchange=()=>{const v=_voiceSelected();if(v)localStorage.setItem('tiff_voice_id',v.name+'|'+v.lang);};
-document.getElementById('voice-speed').oninput=e=>{document.getElementById('voice-speed-val').textContent=e.target.value;localStorage.setItem('tiff_voice_speed',e.target.value);};
-// Voice ayarlarını geri yükle (tarayıcı sesleri)
-(function loadVoiceSettings(){
-  const s=localStorage.getItem('tiff_voice_speed');
-  if(s){const r=document.getElementById('voice-speed');if(r){r.value=s;document.getElementById('voice-speed-val').textContent=s;}}
-  _voicePopulateSelect();
-  if(window.speechSynthesis){
-    window.speechSynthesis.onvoiceschanged=()=>_voicePopulateSelect();
-    setTimeout(_voicePopulateSelect,600);
-  }
-})();
-
 // Drive modal
 document.getElementById('open-drive').onclick=()=>{
   document.getElementById('drive-url').value=localStorage.getItem(DRIVE_KEY_PREFIX+"_url")||'';
